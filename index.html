@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Echt oder Fake?</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,700&display=swap">
+<link rel="stylesheet" href="style.css?v=3">
+</head>
+<body>
+<main class="wrap">
+
+  <!-- Ohne Zugangscode -->
+  <section class="screen stack-lg" id="s-gesperrt" hidden>
+    <div class="stack">
+      <h1>Echt oder Fake?</h1>
+      <p>Diese Umfrage ist nur über den QR-Code erreichbar. Bitte scanne den Code, den du bekommen hast.</p>
+    </div>
+  </section>
+
+  <!-- Start -->
+  <section class="screen stack-lg" id="s-start" hidden>
+    <div class="stack">
+      <div><span class="stamp echt">Echt</span> <span class="stamp fake">Fake</span></div>
+      <h1>Echt oder Fake?</h1>
+      <p>Du bekommst 8 Nachrichten. Jede gibt es in zwei Versionen: Eine stimmt, die andere wurde verfälscht. Du entscheidest, welche echt ist.</p>
+      <p class="muted">Dauer: ca. 5 Minuten · anonym · ohne Namen oder E-Mail</p>
+    </div>
+    <div class="panel stack small">
+      <p><b>Worum geht es?</b> Wir untersuchen in einem Forschungsprojekt, ob Alter und die tägliche Zeit auf Social Media damit zusammenhängen, wie gut man Falschmeldungen erkennt.</p>
+      <p>Gespeichert werden nur deine Antworten sowie Angaben zu Altersgruppe und Mediennutzung. Am Ende siehst du die Auflösung.</p>
+    </div>
+    <p class="panel small" id="schon-dabei" hidden>Von diesem Gerät wurde die Umfrage schon abgeschickt. Danke! Wenn jetzt eine andere Person teilnimmt, kann sie einfach starten.</p>
+    <label class="consent">
+      <input type="checkbox" id="consent">
+      <span>Ich mache freiwillig mit und bin einverstanden, dass meine anonymen Antworten für dieses Projekt ausgewertet werden. Unter 16 nur mit Erlaubnis der Eltern.</span>
+    </label>
+    <button class="btn" id="btn-start" disabled>Umfrage starten</button>
+  </section>
+
+  <!-- Profil -->
+  <section class="screen stack-lg" id="s-profil" hidden>
+    <div class="stack">
+      <span class="eyebrow">Teil 1 von 3 · Über dich</span>
+      <h2>Fünf kurze Fragen vorab</h2>
+    </div>
+    <form id="profil" class="stack-lg" novalidate>
+      <fieldset>
+        <legend>Wie alt bist du?</legend>
+        <div class="chips" data-name="alter"></div>
+      </fieldset>
+      <fieldset>
+        <legend>Wie viel Zeit verbringst du an einem normalen Tag auf Social Media?
+          <span class="hint">TikTok, Instagram, YouTube, Snapchat usw. zusammengerechnet. Am Handy steht das unter „Bildschirmzeit“.</span></legend>
+        <div class="chips" data-name="screentime"></div>
+      </fieldset>
+      <fieldset>
+        <legend>Welche Plattformen nutzt du regelmäßig?
+          <span class="hint">Mehrere Antworten möglich</span></legend>
+        <div class="chips" data-name="plattformen" data-multi="1"></div>
+      </fieldset>
+      <fieldset>
+        <legend>Woher bekommst du hauptsächlich Nachrichten?</legend>
+        <div class="chips" data-name="quelle"></div>
+      </fieldset>
+      <fieldset>
+        <legend>Wie gut erkennst du Fake News?
+          <span class="hint">Deine eigene Einschätzung</span></legend>
+        <div class="scale chips" data-name="selbst"></div>
+        <div class="scale-labels"><span>1 = gar nicht</span><span>5 = sehr gut</span></div>
+      </fieldset>
+      <p class="hinweis" id="profil-hinweis" aria-live="polite"></p>
+      <button class="btn" type="submit">Weiter zu den Nachrichten</button>
+    </form>
+  </section>
+
+  <!-- Szenarien -->
+  <section class="screen stack-lg" id="s-quiz" hidden>
+    <div class="stack">
+      <span class="eyebrow">Teil 2 von 3 · Nachrichten</span>
+      <div class="progress">
+        <div class="bar"><i id="bar"></i></div>
+        <b id="zaehler">1 / 8</b>
+      </div>
+    </div>
+    <p><b>Eine dieser Meldungen ist echt, die andere wurde verfälscht.</b> <span class="muted">Beide sind vom selben Tag.</span></p>
+    <div class="paar" id="paar"></div>
+    <div class="stack">
+      <p class="eyebrow">Deine Antwort</p>
+      <div class="antworten" id="antworten">
+        <button class="antwort" data-wahl="A" data-sicher="sicher"><span><b>A ist echt</b>, B ist Fake</span><small>da bin ich sicher</small></button>
+        <button class="antwort" data-wahl="A" data-sicher="geraten"><span><b>A ist echt</b>, B ist Fake</span><small>eher geraten</small></button>
+        <button class="antwort" data-wahl="B" data-sicher="geraten"><span><b>B ist echt</b>, A ist Fake</span><small>eher geraten</small></button>
+        <button class="antwort" data-wahl="B" data-sicher="sicher"><span><b>B ist echt</b>, A ist Fake</span><small>da bin ich sicher</small></button>
+        <button class="antwort neutral" data-wahl="?" data-sicher=""><span><b>Keine Ahnung</b></span><small>kann ich nicht sagen</small></button>
+      </div>
+      <button class="btn" id="btn-weiter" disabled>Weiter</button>
+    </div>
+  </section>
+
+  <!-- Merkmale -->
+  <section class="screen stack-lg" id="s-merkmale" hidden>
+    <div class="stack">
+      <span class="eyebrow">Teil 3 von 3 · Fast geschafft</span>
+      <h2>Worauf hast du beim Entscheiden geachtet?</h2>
+    </div>
+    <form id="merkmale-form" class="stack-lg" novalidate>
+      <fieldset>
+        <legend>Wähle alles aus, was für dich wichtig war.</legend>
+        <div class="chips" data-name="merkmale" data-multi="1"></div>
+      </fieldset>
+      <p class="hinweis" id="merkmale-hinweis" aria-live="polite"></p>
+      <button class="btn" type="submit">Abschicken und Auflösung sehen</button>
+    </form>
+  </section>
+
+  <!-- Ergebnis -->
+  <section class="screen stack-lg" id="s-ergebnis" hidden>
+    <div class="stack">
+      <span class="eyebrow">Dein Ergebnis</span>
+      <div class="score"><span class="big" id="punkte">0</span><span class="muted" id="von">von 8 richtig</span></div>
+      <p id="kommentar"></p>
+      <p class="status" id="sende-status" aria-live="polite"></p>
+      <button class="btn btn-ghost" id="btn-nochmal-senden" hidden>Erneut senden</button>
+    </div>
+    <div class="stack">
+      <h3>Die Auflösung</h3>
+      <div class="review" id="review"></div>
+    </div>
+    <div class="panel stack">
+      <h3>Woran man Fake News oft erkennt</h3>
+      <ul class="tips">
+        <li>Unbekannter Absender, keine Quelle, kein Link</li>
+        <li>Großbuchstaben, viele Ausrufezeichen, viele Emojis</li>
+        <li>Wertende Wörter wie „Abzocke“ oder „Die Medien lügen“</li>
+        <li>Aufrufe wie „Teilen, bevor es gelöscht wird!“</li>
+        <li>Aber Vorsicht: Auch sachlich geschriebene Texte können falsch sein. Im Zweifel bei seriösen Medien nachsehen.</li>
+      </ul>
+    </div>
+    <p class="muted small">Danke fürs Mitmachen! Bitte verrate die Lösungen nicht an Leute, die noch teilnehmen.</p>
+  </section>
+
+</main>
+
+<script src="config.js?v=3"></script>
+<script>
+(() => {
+  const C = window.UMFRAGE_CONFIG;
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => [...document.querySelectorAll(s)];
+  const store = {
+    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+    del(k) { try { localStorage.removeItem(k); } catch {} }
+  };
+
+  const state = { profil: {}, folge: [], antworten: {}, i: 0, auswahl: null, t0: 0, tItem: 0, zeile: null };
+
+  function zeige(id) {
+    $$(".screen").forEach((s) => (s.hidden = s.id !== id));
+    window.scrollTo(0, 0);
+  }
+
+  // ---------- Zugang ----------
+  // Der Code kommt über den QR-Code als #anker. Gespeichert wird nur sein Hash in config.js.
+  let zugang = "";
+  async function sha256(t) {
+    const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t));
+    return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
+  }
+  (async () => {
+    const ausLink = location.hash.slice(1);
+    const kandidat = ausLink || store.get("fn_zugang") || "";
+    let ok = !C.zugangHash;
+    if (!ok && kandidat && window.crypto?.subtle) ok = (await sha256(kandidat)) === C.zugangHash;
+    if (!ok) { zeige("s-gesperrt"); return; }
+    zugang = kandidat;
+    store.set("fn_zugang", kandidat);
+    // Code aus der Adresszeile entfernen, damit er nicht versehentlich weitergeschickt wird
+    if (ausLink) history.replaceState(null, "", location.pathname);
+    zeige("s-start");
+  })();
+
+  // ---------- Start ----------
+  if (store.get("fn_fertig")) $("#schon-dabei").hidden = false;
+  $("#consent").addEventListener("change", (e) => ($("#btn-start").disabled = !e.target.checked));
+  $("#btn-start").addEventListener("click", () => { state.t0 = Date.now(); zeige("s-profil"); });
+
+  // ---------- Auswahl-Chips ----------
+  const optionen = {
+    alter: C.alter, screentime: C.screentime, plattformen: C.plattformen,
+    quelle: C.quellen, selbst: ["1", "2", "3", "4", "5"], merkmale: C.merkmale
+  };
+  $$(".chips[data-name]").forEach((box) => {
+    const name = box.dataset.name;
+    const multi = box.dataset.multi === "1";
+    optionen[name].forEach((wert, n) => {
+      const lab = document.createElement("label");
+      lab.className = "chip";
+      const input = document.createElement("input");
+      input.type = multi ? "checkbox" : "radio";
+      input.name = name;
+      input.id = `${name}-${n}`;
+      input.value = wert;
+      const span = document.createElement("span");
+      span.textContent = wert;
+      lab.append(input, span);
+      box.appendChild(lab);
+    });
+  });
+  // "Keine davon" schließt die anderen Plattformen aus
+  $("#profil").addEventListener("change", (e) => {
+    if (e.target.name !== "plattformen" || !e.target.checked) return;
+    const keine = e.target.value === "Keine davon";
+    $$('input[name="plattformen"]').forEach((i) => {
+      if (i !== e.target && (keine || i.value === "Keine davon")) i.checked = false;
+    });
+  });
+  const gewaehlt = (n) => $$(`input[name="${n}"]:checked`).map((i) => i.value);
+
+  // ---------- Profil ----------
+  $("#profil").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const p = {
+      alter: gewaehlt("alter")[0], screentime: gewaehlt("screentime")[0],
+      plattformen: gewaehlt("plattformen"), quelle: gewaehlt("quelle")[0], selbst: gewaehlt("selbst")[0]
+    };
+    const fehlt = [];
+    if (!p.alter) fehlt.push("Alter");
+    if (!p.screentime) fehlt.push("Zeit auf Social Media");
+    if (!p.plattformen.length) fehlt.push("Plattformen");
+    if (!p.quelle) fehlt.push("Nachrichtenquelle");
+    if (!p.selbst) fehlt.push("Einschätzung");
+    if (fehlt.length) { $("#profil-hinweis").textContent = "Bitte noch beantworten: " + fehlt.join(", "); return; }
+    $("#profil-hinweis").textContent = "";
+    state.profil = p;
+    // Reihenfolge mischen und pro Szenario auslosen, ob die echte Meldung oben (A) oder unten (B) steht
+    state.folge = mische(C.szenarien.map((s) => ({ id: s.id, echtPos: Math.random() < 0.5 ? "A" : "B" })));
+    state.i = 0;
+    zeige("s-quiz");
+    zeigeSzenario();
+  });
+
+  function mische(a) {
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+
+  // ---------- Karten ----------
+  const farben = ["#23408e", "#6b3fa0", "#0d7373", "#b4441b", "#a3195b", "#4a6b12", "#4b5565"];
+  const farbeFuer = (name) => farben[[...name].reduce((s, c) => s + c.charCodeAt(0), 0) % farben.length];
+
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function karte(m) {
+    if (m.format === "artikel") {
+      const a = el("article", "artikel");
+      const kopf = el("div", "kopf");
+      kopf.append(el("span", "outlet", m.absender), el("span", "meta", `${m.rubrik} · ${m.datum}`));
+      a.append(kopf, el("h3", null, m.titel), el("p", null, m.text));
+      return a;
+    }
+    const a = el("article", "post");
+    const kopf = el("div", "kopf");
+    const av = el("div", "avatar", m.absender[0].toUpperCase());
+    av.style.background = farbeFuer(m.absender);
+    const who = el("div", "who");
+    who.append(el("b", null, "@" + m.absender), el("span", null, m.datum));
+    kopf.append(av, who);
+    const re = el("div", "reaktionen");
+    re.append(el("span", null, `♥ ${m.likes}`), el("span", null, `↻ ${m.shares}`));
+    a.append(kopf, el("p", null, m.text), re);
+    return a;
+  }
+
+  const szenario = (id) => C.szenarien.find((s) => s.id === id);
+
+  function zeigeSzenario() {
+    const f = state.folge[state.i];
+    const s = szenario(f.id);
+    const n = state.folge.length;
+    $("#zaehler").textContent = `${state.i + 1} / ${n}`;
+    $("#bar").style.width = `${(state.i / n) * 100}%`;
+    const oben = f.echtPos === "A" ? s.echt : s.fake;
+    const unten = f.echtPos === "A" ? s.fake : s.echt;
+    const paar = $("#paar");
+    paar.innerHTML = "";
+    [["A", oben], ["B", unten]].forEach(([buchstabe, meldung]) => {
+      const box = el("div", "karte");
+      const label = el("div", "karte-label");
+      label.append(el("i", null, buchstabe), document.createTextNode(`Meldung ${buchstabe}`));
+      box.append(label, karte(meldung));
+      paar.appendChild(box);
+    });
+    state.auswahl = null;
+    $$(".antwort").forEach((b) => b.setAttribute("aria-pressed", "false"));
+    $("#btn-weiter").disabled = true;
+    $("#btn-weiter").textContent = state.i === n - 1 ? "Letzte Antwort speichern" : "Weiter";
+    state.tItem = Date.now();
+    window.scrollTo(0, 0);
+  }
+
+  $$(".antwort").forEach((b) =>
+    b.addEventListener("click", () => {
+      state.auswahl = { wahl: b.dataset.wahl, sicher: b.dataset.sicher };
+      $$(".antwort").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      $("#btn-weiter").disabled = false;
+    })
+  );
+
+  $("#btn-weiter").addEventListener("click", () => {
+    if (!state.auswahl) return;
+    const f = state.folge[state.i];
+    const { wahl, sicher } = state.auswahl;
+    state.antworten[f.id] = {
+      wahl, sicher,
+      echtPos: f.echtPos,
+      ergebnis: wahl === "?" ? "keine_ahnung" : wahl === f.echtPos ? "richtig" : "falsch",
+      ms: Date.now() - state.tItem,
+      position: state.i + 1
+    };
+    state.i++;
+    if (state.i < state.folge.length) zeigeSzenario();
+    else zeige("s-merkmale");
+  });
+
+  // ---------- Merkmale & Abschluss ----------
+  $("#merkmale-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const m = gewaehlt("merkmale");
+    if (!m.length) { $("#merkmale-hinweis").textContent = "Bitte mindestens eine Sache auswählen."; return; }
+    state.merkmale = m;
+    ergebnis();
+  });
+
+  function ergebnis() {
+    const A = state.antworten;
+    const ids = C.szenarien.map((s) => s.id);
+    const richtig = ids.filter((id) => A[id].ergebnis === "richtig").length;
+    const falsch = ids.filter((id) => A[id].ergebnis === "falsch").length;
+    const ka = ids.filter((id) => A[id].ergebnis === "keine_ahnung").length;
+
+    $("#punkte").textContent = richtig;
+    $("#von").textContent = `von ${ids.length} richtig` + (ka ? ` · ${ka}× keine Ahnung` : "");
+    const q = richtig / ids.length;
+    $("#kommentar").textContent =
+      q === 1 ? "Alle richtig. Dich legt so schnell niemand rein." :
+      q >= 0.75 ? "Sehr gut. Die meisten Fälschungen hast du durchschaut." :
+      q >= 0.5 ? "Ganz ordentlich, aber ein paar Fälschungen haben dich erwischt." :
+      "Das war schwierig. Schau dir die Auflösung an, da steckt viel drin.";
+
+    const review = $("#review");
+    review.innerHTML = "";
+    C.szenarien.forEach((s) => {
+      const a = A[s.id];
+      const fakePos = a.echtPos === "A" ? "B" : "A";
+      const box = el("div", "review-item");
+      const row = el("div", "row");
+      row.append(el("b", null, s.thema));
+      const v = el("span", "verdict " + (a.ergebnis === "richtig" ? "ok" : a.ergebnis === "falsch" ? "no" : "na"),
+        a.ergebnis === "richtig" ? "✓ richtig" : a.ergebnis === "falsch" ? `✗ Fake war ${fakePos}` : "– keine Ahnung");
+      row.append(v);
+      box.append(row);
+      box.append(el("p", "zitat", s.fake.titel || s.fake.text));
+      box.append(el("p", "small", s.aufloesung));
+      const tags = el("div", "tags");
+      s.fake.merkmale.forEach((t) => tags.append(el("span", "tag", t)));
+      box.append(tags);
+      review.appendChild(box);
+    });
+
+    const p = state.profil;
+    const zeile = {
+      zugang,
+      zeitpunkt: new Date().toISOString(),
+      alter: p.alter,
+      screentime: p.screentime,
+      plattformen: p.plattformen.join(", "),
+      quelle: p.quelle,
+      selbsteinschaetzung: Number(p.selbst),
+      richtig, falsch, keine_ahnung: ka,
+      anzahl: ids.length,
+      quote: Math.round((richtig / ids.length) * 100),
+      merkmale: state.merkmale.join(", "),
+      dauer_s: Math.round((Date.now() - state.t0) / 1000),
+      geraet: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "mobil" : "desktop"
+    };
+    C.szenarien.forEach((s) => {
+      const a = A[s.id];
+      zeile[`${s.id}_ergebnis`] = a.ergebnis;
+      zeile[`${s.id}_sicher`] = a.sicher;
+      zeile[`${s.id}_echt_pos`] = a.echtPos;
+      zeile[`${s.id}_ms`] = a.ms;
+    });
+    state.zeile = zeile;
+    zeige("s-ergebnis");
+    senden(zeile);
+  }
+
+  async function senden(zeile) {
+    const status = $("#sende-status");
+    const knopf = $("#btn-nochmal-senden");
+    knopf.hidden = true;
+    if (!C.endpoint) {
+      status.textContent = "Testmodus: Es ist noch kein Speicherort eingerichtet. Die Antworten wurden nicht gespeichert.";
+      console.log("Testmodus – Daten:", zeile);
+      return;
+    }
+    status.textContent = "Antworten werden gespeichert …";
+    try {
+      await fetch(C.endpoint, {
+        method: "POST", mode: "no-cors", keepalive: true,
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(zeile)
+      });
+      store.del("fn_offen");
+      store.set("fn_fertig", true);
+      status.textContent = "Deine anonymen Antworten wurden gespeichert. Danke!";
+    } catch (err) {
+      store.set("fn_offen", zeile);
+      status.textContent = "Speichern hat nicht geklappt, wahrscheinlich ist das Internet weg. Versuch es gleich noch einmal.";
+      knopf.hidden = false;
+    }
+  }
+  $("#btn-nochmal-senden").addEventListener("click", () => senden(state.zeile));
+
+  // Falls beim letzten Mal das Senden fehlschlug: still nachholen
+  const offen = store.get("fn_offen");
+  if (offen && C.endpoint) {
+    fetch(C.endpoint, {
+      method: "POST", mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(offen)
+    }).then(() => { store.del("fn_offen"); store.set("fn_fertig", true); }).catch(() => {});
+  }
+})();
+</script>
+</body>
+</html>

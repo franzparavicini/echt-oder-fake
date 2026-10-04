@@ -1,0 +1,8 @@
+# Nur die Website-Dateien veröffentlichen. Alles andere (Passwörter, Script, QR) bleibt lokal.
+*
+!.gitignore
+!index.html
+!auswertung.html
+!config.js
+!style.css
+!robots.txt

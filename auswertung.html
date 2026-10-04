@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Auswertung Echt oder Fake</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<link rel="stylesheet" href="style.css?v=3">
+<style>
+  .wrap { max-width: 880px; }
+  .login { display: flex; gap: 10px; flex-wrap: wrap; }
+  .login input {
+    flex: 1 1 220px; font: 16px var(--body); padding: 12px 14px; border-radius: 10px;
+    border: 1.5px solid var(--line); background: var(--surface); color: var(--ink);
+  }
+  .login .btn { width: auto; flex: 0 0 auto; }
+  .werkzeuge { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; font-size: 0.9rem; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+  .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .kpi b { display: block; font: 800 1.9rem/1.1 var(--display); font-variant-numeric: tabular-nums; }
+  .kpi span { font-size: 0.85rem; color: var(--muted); }
+  section.block { display: flex; flex-direction: column; gap: 12px; }
+  section.block > p { max-width: 65ch; }
+  .bars { display: flex; flex-direction: column; gap: 9px; }
+  .bar-row { display: grid; grid-template-columns: minmax(96px, 28%) 1fr 92px; gap: 12px; align-items: center; font-size: 0.92rem; }
+  .track { height: 18px; background: var(--line); border-radius: 3px; overflow: hidden; display: flex; }
+  .fill { height: 100%; background: var(--accent); }
+  .seg-ok { background: var(--echt); }
+  .seg-no { background: var(--fake); }
+  .seg-na { background: var(--muted); opacity: .45; }
+  .val { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+  .val small { color: var(--muted); display: block; font-size: 0.74rem; font-weight: 400; }
+  .legende { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.82rem; color: var(--muted); }
+  .legende i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: separate; border-spacing: 4px; font-size: 0.88rem; min-width: 540px; }
+  th { font: 700 0.8rem var(--display); color: var(--muted); text-align: left; padding: 4px; white-space: nowrap; }
+  td.cell { text-align: center; border-radius: 5px; padding: 9px 4px; font-variant-numeric: tabular-nums; font-weight: 700; min-width: 70px; }
+  td.cell small { display: block; font-weight: 400; opacity: .8; font-size: 0.72rem; }
+  td.leer { color: var(--muted); background: var(--surface); font-weight: 400; }
+  .notice { border: 1.5px dashed var(--fake); border-radius: 10px; padding: 10px 14px; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<main class="wrap stack-lg">
+  <div class="stack">
+    <span class="eyebrow">Auswertung</span>
+    <h1>Echt oder Fake?</h1>
+    <p class="muted">Wie gut erkennen verschiedene Altersgruppen bei unterschiedlicher Social-Media-Zeit die verfälschte Meldung?</p>
+  </div>
+
+  <form class="login" id="login">
+    <input id="key" type="password" placeholder="Auswertungs-Passwort" autocomplete="current-password">
+    <button class="btn" type="submit">Daten laden</button>
+    <button class="btn btn-ghost" type="button" id="demo">Beispieldaten</button>
+  </form>
+  <div class="werkzeuge">
+    <span class="status" id="status" aria-live="polite"></span>
+    <button class="link" id="csv" hidden>Rohdaten als CSV herunterladen</button>
+  </div>
+
+  <div id="inhalt" class="stack-lg"></div>
+</main>
+
+<script src="config.js?v=3"></script>
+<script>
+(() => {
+  const C = window.UMFRAGE_CONFIG;
+  const S = C.szenarien;
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  let aktuelleRows = [];
+  let timer = null;
+
+  try { $("#key").value = localStorage.getItem("fn_key") || ""; } catch {}
+
+  async function laden() {
+    if (!C.endpoint) { $("#status").textContent = "In config.js ist noch kein endpoint eingetragen."; return; }
+    const key = $("#key").value;
+    try { localStorage.setItem("fn_key", key); } catch {}
+    try {
+      const r = await fetch(`${C.endpoint}?key=${encodeURIComponent(key)}`);
+      const d = await r.json();
+      if (!d.ok) { $("#status").textContent = d.error || "Fehler beim Laden."; clearInterval(timer); return; }
+      $("#status").textContent = `Live · aktualisiert ${new Date().toLocaleTimeString("de-DE")} · lädt jede Minute neu`;
+      render(d.rows, false);
+    } catch (err) {
+      $("#status").textContent = "Laden fehlgeschlagen. Internetverbindung oder endpoint-URL prüfen.";
+    }
+  }
+
+  $("#login").addEventListener("submit", (e) => {
+    e.preventDefault();
+    $("#status").textContent = "Lade …";
+    clearInterval(timer);
+    laden();
+    timer = setInterval(laden, 60000);
+  });
+  $("#demo").addEventListener("click", () => {
+    clearInterval(timer);
+    $("#status").textContent = "";
+    render(beispiel(), true);
+  });
+
+  $("#csv").addEventListener("click", () => {
+    if (!aktuelleRows.length) return;
+    const spalten = [...new Set(aktuelleRows.flatMap((r) => Object.keys(r)))];
+    const zelle = (v) => { const s = String(v ?? ""); return /[";\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+    const csv = [spalten.join(";"), ...aktuelleRows.map((r) => spalten.map((k) => zelle(r[k])).join(";"))].join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }));
+    a.download = `echt-oder-fake_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+  });
+
+  // ---------- erfundene Beispieldaten für die Vorschau ----------
+  function beispiel() {
+    const rows = [];
+    const schw = { leicht: 0.9, mittel: 0.72, schwer: 0.45 };
+    for (let n = 0; n < 160; n++) {
+      const a = Math.floor(Math.random() * C.alter.length);
+      const s = Math.floor(Math.random() * C.screentime.length);
+      const row = {
+        alter: C.alter[a], screentime: C.screentime[s],
+        selbsteinschaetzung: 1 + Math.floor(Math.random() * 5),
+        merkmale: C.merkmale.filter(() => Math.random() < 0.35).join(", ") || C.merkmale[6]
+      };
+      let r = 0, f = 0, k = 0;
+      S.forEach((sz) => {
+        const p = Math.max(0.15, Math.min(0.97, schw[sz.schwierigkeit] - 0.03 * s + (a === 5 ? -0.06 : 0) + (Math.random() - 0.5) * 0.15));
+        const x = Math.random();
+        const erg = x < 0.07 ? "keine_ahnung" : x < 0.07 + p * 0.93 ? "richtig" : "falsch";
+        row[`${sz.id}_ergebnis`] = erg;
+        row[`${sz.id}_sicher`] = erg === "keine_ahnung" ? "" : Math.random() < 0.5 + 0.05 * s ? "sicher" : "geraten";
+        erg === "richtig" ? r++ : erg === "falsch" ? f++ : k++;
+      });
+      Object.assign(row, { richtig: r, falsch: f, keine_ahnung: k, anzahl: S.length, quote: Math.round(r / S.length * 100) });
+      rows.push(row);
+    }
+    return rows;
+  }
+
+  // ---------- Berechnung ----------
+  const mittel = (a) => (a.length ? a.reduce((s, x) => s + x, 0) / a.length : null);
+  const pct = (v) => (v == null ? "–" : Math.round(v) + " %");
+  const quote = (r) => (Number(r.richtig) / Number(r.anzahl || S.length)) * 100;
+  const kaQuote = (r) => (Number(r.keine_ahnung || 0) / Number(r.anzahl || S.length)) * 100;
+
+  // Einzelantworten flach: eine Zeile pro Person × Szenario
+  function antworten(rows) {
+    return rows.flatMap((r) => S.map((s) => ({
+      row: r, szenario: s, ergebnis: r[`${s.id}_ergebnis`], sicher: r[`${s.id}_sicher`]
+    })).filter((x) => x.ergebnis));
+  }
+
+  function gruppe(rows, feld, werte) {
+    return werte.map((w) => {
+      const g = rows.filter((r) => String(r[feld]) === String(w));
+      return { label: w, n: g.length, wert: mittel(g.map(quote)), ka: mittel(g.map(kaQuote)) };
+    });
+  }
+
+  function balken(daten, mitKa = true) {
+    return `<div class="bars">${daten.map((d) => `
+      <div class="bar-row">
+        <span>${esc(d.label)}</span>
+        <div class="track"><div class="fill" style="width:${d.wert ?? 0}%"></div></div>
+        <span class="val">${pct(d.wert)}<small>n = ${d.n}${mitKa && d.ka ? ` · ${Math.round(d.ka)} % k. A.` : ""}</small></span>
+      </div>`).join("")}</div>`;
+  }
+
+  function farbe(v) {
+    const t = Math.max(0, Math.min(1, (v - 30) / 70));
+    return `background:hsl(${Math.round(6 + t * 140)} 55% 46%);color:#fff`;
+  }
+
+  function tabelle(zeilen, spalten, wert) {
+    return `<div class="scroll"><table>
+      <thead><tr><th></th>${spalten.map((s) => `<th>${esc(s)}</th>`).join("")}</tr></thead>
+      <tbody>${zeilen.map((z) => `<tr><th>${esc(z)}</th>${spalten.map((s) => {
+        const { v, n } = wert(z, s);
+        if (!n) return `<td class="cell leer">–</td>`;
+        return `<td class="cell" style="${farbe(v)}">${Math.round(v)} %<small>n = ${n}</small></td>`;
+      }).join("")}</tr>`).join("")}</tbody></table></div>`;
+  }
+
+  // ---------- Darstellung ----------
+  function render(rows, demo) {
+    aktuelleRows = rows;
+    $("#csv").hidden = !rows.length;
+    const inhalt = $("#inhalt");
+    if (!rows.length) { inhalt.innerHTML = `<p class="muted">Noch keine Antworten. Sobald jemand die Umfrage abschickt, erscheint sie hier.</p>`; return; }
+
+    const alle = antworten(rows);
+    const beantwortet = alle.filter((x) => x.ergebnis !== "keine_ahnung");
+    const sicher = beantwortet.filter((x) => x.sicher === "sicher");
+    const anteilRichtig = (liste) => (liste.length ? (liste.filter((x) => x.ergebnis === "richtig").length / liste.length) * 100 : null);
+
+    const matrix = tabelle(C.alter, C.screentime, (a, s) => {
+      const g = rows.filter((r) => r.alter === a && r.screentime === s);
+      return { v: mittel(g.map(quote)), n: g.length };
+    });
+
+    const stufen = ["leicht", "mittel", "schwer"];
+    const schwierigkeit = tabelle(C.screentime, stufen, (st, stufe) => {
+      const g = alle.filter((x) => x.row.screentime === st && x.szenario.schwierigkeit === stufe);
+      return { v: anteilRichtig(g), n: new Set(g.map((x) => x.row)).size };
+    });
+
+    const kalibrierung = C.screentime.map((st) => {
+      const g = sicher.filter((x) => x.row.screentime === st);
+      return { label: st, n: new Set(g.map((x) => x.row)).size, wert: anteilRichtig(g) };
+    });
+
+    const merkmale = C.merkmale.map((m) => {
+      const n = rows.filter((r) => String(r.merkmale || "").split(", ").includes(m)).length;
+      return { label: m, n, wert: (n / rows.length) * 100 };
+    }).sort((a, b) => b.wert - a.wert);
+
+    const proSzenario = S.map((s) => {
+      const g = alle.filter((x) => x.szenario.id === s.id);
+      const anteil = (e) => (g.length ? (g.filter((x) => x.ergebnis === e).length / g.length) * 100 : 0);
+      return { s, n: g.length, ok: anteil("richtig"), no: anteil("falsch"), na: anteil("keine_ahnung") };
+    });
+
+    inhalt.innerHTML = `
+      ${demo ? `<p class="notice">Erfundene Beispieldaten. So sieht die Auswertung aus, sobald echte Antworten da sind.</p>` : ""}
+      <div class="kpis">
+        <div class="kpi"><b>${rows.length}</b><span>Teilnehmende</span></div>
+        <div class="kpi"><b>${pct(mittel(rows.map(quote)))}</b><span>richtig erkannt im Schnitt</span></div>
+        <div class="kpi"><b>${pct(mittel(rows.map(kaQuote)))}</b><span>„Keine Ahnung“</span></div>
+        <div class="kpi"><b>${pct(anteilRichtig(sicher))}</b><span>richtig, wenn „sicher“ gewählt</span></div>
+      </div>
+
+      <section class="block">
+        <h2>Nach täglicher Social-Media-Zeit</h2>
+        <p class="muted small">Anteil richtig erkannter Paare. „k. A.“ = Anteil „Keine Ahnung“.</p>
+        ${balken(gruppe(rows, "screentime", C.screentime))}
+      </section>
+
+      <section class="block">
+        <h2>Nach Altersgruppe</h2>
+        ${balken(gruppe(rows, "alter", C.alter))}
+      </section>
+
+      <section class="block">
+        <h2>Alter × Social-Media-Zeit</h2>
+        <p class="muted small">Zeilen: Altersgruppe, Spalten: Zeit pro Tag. Zellen mit kleinem n bitte vorsichtig deuten.</p>
+        ${matrix}
+      </section>
+
+      <section class="block">
+        <h2>Leichte und schwere Fälschungen</h2>
+        <p class="muted small">Leicht: Fake mit vielen typischen Merkmalen (Großbuchstaben, Emojis, Ausrufezeichen). Schwer: Fake sachlich formuliert, die echte Meldung als Social-Media-Post.</p>
+        ${schwierigkeit}
+      </section>
+
+      <section class="block">
+        <h2>Wie oft lagen die „Sicheren“ richtig?</h2>
+        <p class="muted small">Nur Antworten mit „da bin ich sicher“. Ein niedriger Wert bedeutet Selbstüberschätzung.</p>
+        ${balken(kalibrierung, false)}
+      </section>
+
+      <section class="block">
+        <h2>Selbsteinschätzung und Ergebnis</h2>
+        ${balken(gruppe(rows, "selbsteinschaetzung", [1, 2, 3, 4, 5]).map((d) => ({ ...d, label: `sagt ${d.label} von 5` })))}
+      </section>
+
+      <section class="block">
+        <h2>Worauf die Leute geachtet haben</h2>
+        <p class="muted small">Anteil der Teilnehmenden, die das Merkmal genannt haben.</p>
+        ${balken(merkmale, false)}
+      </section>
+
+      <section class="block">
+        <h2>Die einzelnen Paare</h2>
+        <div class="legende"><span><i class="seg-ok"></i>richtig</span><span><i class="seg-no"></i>falsch</span><span><i class="seg-na"></i>keine Ahnung</span></div>
+        <div class="bars">${proSzenario.map((d) => `
+          <div class="bar-row">
+            <span>${esc(d.s.thema)} <small class="muted">(${d.s.schwierigkeit})</small></span>
+            <div class="track"><div class="seg-ok" style="width:${d.ok}%"></div><div class="seg-no" style="width:${d.no}%"></div><div class="seg-na" style="width:${d.na}%"></div></div>
+            <span class="val">${Math.round(d.ok)} %<small>n = ${d.n}</small></span>
+          </div>`).join("")}</div>
+      </section>`;
+  }
+})();
+</script>
+</body>
+</html>
