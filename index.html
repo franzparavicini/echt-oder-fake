@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,700&display=swap">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 <main class="wrap">
@@ -26,12 +26,12 @@
     <div class="stack">
       <div><span class="stamp echt">Echt</span> <span class="stamp fake">Fake</span></div>
       <h1>Echt oder Fake?</h1>
-      <p>Du bekommst 8 Nachrichten. Jede gibt es in zwei Versionen: Eine stimmt, die andere wurde verfälscht. Du entscheidest, welche echt ist.</p>
-      <p class="muted">Dauer: ca. 5 Minuten · anonym · ohne Namen oder E-Mail</p>
+      <p>Du bekommst 15 Nachrichten. Jede gibt es in zwei Versionen: Eine stimmt, die andere wurde verfälscht. Du entscheidest, welche echt ist.</p>
+      <p class="muted">Dauer: ca. 7 Minuten · anonym · ohne Namen oder E-Mail</p>
     </div>
     <div class="panel stack small">
       <p><b>Worum geht es?</b> Wir untersuchen in einem Forschungsprojekt, ob Alter und die tägliche Zeit auf Social Media damit zusammenhängen, wie gut man Falschmeldungen erkennt.</p>
-      <p>Gespeichert werden nur deine Antworten sowie Angaben zu Altersgruppe und Mediennutzung. Am Ende siehst du die Auflösung.</p>
+      <p>Gespeichert werden nur deine Altersgruppe, deine tägliche Social-Media-Zeit und deine Antworten. Am Ende siehst du die Auflösung.</p>
     </div>
     <p class="panel small" id="schon-dabei" hidden>Von diesem Gerät wurde die Umfrage schon abgeschickt. Danke! Wenn jetzt eine andere Person teilnimmt, kann sie einfach starten.</p>
     <label class="consent">
@@ -44,8 +44,8 @@
   <!-- Profil -->
   <section class="screen stack-lg" id="s-profil" hidden>
     <div class="stack">
-      <span class="eyebrow">Teil 1 von 3 · Über dich</span>
-      <h2>Fünf kurze Fragen vorab</h2>
+      <span class="eyebrow">Teil 1 von 2 · Über dich</span>
+      <h2>Zwei kurze Fragen vorab</h2>
     </div>
     <form id="profil" class="stack-lg" novalidate>
       <fieldset>
@@ -57,21 +57,6 @@
           <span class="hint">TikTok, Instagram, YouTube, Snapchat usw. zusammengerechnet. Am Handy steht das unter „Bildschirmzeit“.</span></legend>
         <div class="chips" data-name="screentime"></div>
       </fieldset>
-      <fieldset>
-        <legend>Welche Plattformen nutzt du regelmäßig?
-          <span class="hint">Mehrere Antworten möglich</span></legend>
-        <div class="chips" data-name="plattformen" data-multi="1"></div>
-      </fieldset>
-      <fieldset>
-        <legend>Woher bekommst du hauptsächlich Nachrichten?</legend>
-        <div class="chips" data-name="quelle"></div>
-      </fieldset>
-      <fieldset>
-        <legend>Wie gut erkennst du Fake News?
-          <span class="hint">Deine eigene Einschätzung</span></legend>
-        <div class="scale chips" data-name="selbst"></div>
-        <div class="scale-labels"><span>1 = gar nicht</span><span>5 = sehr gut</span></div>
-      </fieldset>
       <p class="hinweis" id="profil-hinweis" aria-live="polite"></p>
       <button class="btn" type="submit">Weiter zu den Nachrichten</button>
     </form>
@@ -80,10 +65,10 @@
   <!-- Szenarien -->
   <section class="screen stack-lg" id="s-quiz" hidden>
     <div class="stack">
-      <span class="eyebrow">Teil 2 von 3 · Nachrichten</span>
+      <span class="eyebrow">Teil 2 von 2 · Nachrichten</span>
       <div class="progress">
         <div class="bar"><i id="bar"></i></div>
-        <b id="zaehler">1 / 8</b>
+        <b id="zaehler">1 / 15</b>
       </div>
     </div>
     <p><b>Eine dieser Meldungen ist echt, die andere wurde verfälscht.</b> <span class="muted">Beide sind vom selben Tag.</span></p>
@@ -101,27 +86,11 @@
     </div>
   </section>
 
-  <!-- Merkmale -->
-  <section class="screen stack-lg" id="s-merkmale" hidden>
-    <div class="stack">
-      <span class="eyebrow">Teil 3 von 3 · Fast geschafft</span>
-      <h2>Worauf hast du beim Entscheiden geachtet?</h2>
-    </div>
-    <form id="merkmale-form" class="stack-lg" novalidate>
-      <fieldset>
-        <legend>Wähle alles aus, was für dich wichtig war.</legend>
-        <div class="chips" data-name="merkmale" data-multi="1"></div>
-      </fieldset>
-      <p class="hinweis" id="merkmale-hinweis" aria-live="polite"></p>
-      <button class="btn" type="submit">Abschicken und Auflösung sehen</button>
-    </form>
-  </section>
-
   <!-- Ergebnis -->
   <section class="screen stack-lg" id="s-ergebnis" hidden>
     <div class="stack">
       <span class="eyebrow">Dein Ergebnis</span>
-      <div class="score"><span class="big" id="punkte">0</span><span class="muted" id="von">von 8 richtig</span></div>
+      <div class="score"><span class="big" id="punkte">0</span><span class="muted" id="von">von 15 richtig</span></div>
       <p id="kommentar"></p>
       <p class="status" id="sende-status" aria-live="polite"></p>
       <button class="btn btn-ghost" id="btn-nochmal-senden" hidden>Erneut senden</button>
@@ -145,7 +114,7 @@
 
 </main>
 
-<script src="config.js?v=3"></script>
+<script src="config.js?v=4"></script>
 <script>
 (() => {
   const C = window.UMFRAGE_CONFIG;
@@ -157,7 +126,7 @@
     del(k) { try { localStorage.removeItem(k); } catch {} }
   };
 
-  const state = { profil: {}, folge: [], antworten: {}, i: 0, auswahl: null, t0: 0, tItem: 0, zeile: null };
+  const state = { profil: {}, folge: [], antworten: {}, i: 0, auswahl: null, t0: 0, zeile: null };
 
   function zeige(id) {
     $$(".screen").forEach((s) => (s.hidden = s.id !== id));
@@ -191,8 +160,7 @@
 
   // ---------- Auswahl-Chips ----------
   const optionen = {
-    alter: C.alter, screentime: C.screentime, plattformen: C.plattformen,
-    quelle: C.quellen, selbst: ["1", "2", "3", "4", "5"], merkmale: C.merkmale
+    alter: C.alter, screentime: C.screentime
   };
   $$(".chips[data-name]").forEach((box) => {
     const name = box.dataset.name;
@@ -211,29 +179,15 @@
       box.appendChild(lab);
     });
   });
-  // "Keine davon" schließt die anderen Plattformen aus
-  $("#profil").addEventListener("change", (e) => {
-    if (e.target.name !== "plattformen" || !e.target.checked) return;
-    const keine = e.target.value === "Keine davon";
-    $$('input[name="plattformen"]').forEach((i) => {
-      if (i !== e.target && (keine || i.value === "Keine davon")) i.checked = false;
-    });
-  });
   const gewaehlt = (n) => $$(`input[name="${n}"]:checked`).map((i) => i.value);
 
   // ---------- Profil ----------
   $("#profil").addEventListener("submit", (e) => {
     e.preventDefault();
-    const p = {
-      alter: gewaehlt("alter")[0], screentime: gewaehlt("screentime")[0],
-      plattformen: gewaehlt("plattformen"), quelle: gewaehlt("quelle")[0], selbst: gewaehlt("selbst")[0]
-    };
+    const p = { alter: gewaehlt("alter")[0], screentime: gewaehlt("screentime")[0] };
     const fehlt = [];
     if (!p.alter) fehlt.push("Alter");
     if (!p.screentime) fehlt.push("Zeit auf Social Media");
-    if (!p.plattformen.length) fehlt.push("Plattformen");
-    if (!p.quelle) fehlt.push("Nachrichtenquelle");
-    if (!p.selbst) fehlt.push("Einschätzung");
     if (fehlt.length) { $("#profil-hinweis").textContent = "Bitte noch beantworten: " + fehlt.join(", "); return; }
     $("#profil-hinweis").textContent = "";
     state.profil = p;
@@ -260,8 +214,8 @@
     return e;
   }
 
-  function karte(m) {
-    if (m.format === "artikel") {
+  function karte(m, format) {
+    if (format === "artikel") {
       const a = el("article", "artikel");
       const kopf = el("div", "kopf");
       kopf.append(el("span", "outlet", m.absender), el("span", "meta", `${m.rubrik} · ${m.datum}`));
@@ -294,17 +248,17 @@
     const paar = $("#paar");
     paar.innerHTML = "";
     [["A", oben], ["B", unten]].forEach(([buchstabe, meldung]) => {
+      const format = meldung === s.echt ? "artikel" : "post";
       const box = el("div", "karte");
       const label = el("div", "karte-label");
       label.append(el("i", null, buchstabe), document.createTextNode(`Meldung ${buchstabe}`));
-      box.append(label, karte(meldung));
+      box.append(label, karte(meldung, format));
       paar.appendChild(box);
     });
     state.auswahl = null;
     $$(".antwort").forEach((b) => b.setAttribute("aria-pressed", "false"));
     $("#btn-weiter").disabled = true;
-    $("#btn-weiter").textContent = state.i === n - 1 ? "Letzte Antwort speichern" : "Weiter";
-    state.tItem = Date.now();
+    $("#btn-weiter").textContent = state.i === n - 1 ? "Abschicken und Auflösung sehen" : "Weiter";
     window.scrollTo(0, 0);
   }
 
@@ -324,22 +278,14 @@
       wahl, sicher,
       echtPos: f.echtPos,
       ergebnis: wahl === "?" ? "keine_ahnung" : wahl === f.echtPos ? "richtig" : "falsch",
-      ms: Date.now() - state.tItem,
       position: state.i + 1
     };
     state.i++;
     if (state.i < state.folge.length) zeigeSzenario();
-    else zeige("s-merkmale");
+    else ergebnis();
   });
 
-  // ---------- Merkmale & Abschluss ----------
-  $("#merkmale-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const m = gewaehlt("merkmale");
-    if (!m.length) { $("#merkmale-hinweis").textContent = "Bitte mindestens eine Sache auswählen."; return; }
-    state.merkmale = m;
-    ergebnis();
-  });
+  // ---------- Abschluss ----------
 
   function ergebnis() {
     const A = state.antworten;
@@ -383,22 +329,17 @@
       zeitpunkt: new Date().toISOString(),
       alter: p.alter,
       screentime: p.screentime,
-      plattformen: p.plattformen.join(", "),
-      quelle: p.quelle,
-      selbsteinschaetzung: Number(p.selbst),
       richtig, falsch, keine_ahnung: ka,
       anzahl: ids.length,
       quote: Math.round((richtig / ids.length) * 100),
-      merkmale: state.merkmale.join(", "),
-      dauer_s: Math.round((Date.now() - state.t0) / 1000),
-      geraet: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "mobil" : "desktop"
+      dauer_s: Math.round((Date.now() - state.t0) / 1000)
     };
     C.szenarien.forEach((s) => {
       const a = A[s.id];
       zeile[`${s.id}_ergebnis`] = a.ergebnis;
       zeile[`${s.id}_sicher`] = a.sicher;
       zeile[`${s.id}_echt_pos`] = a.echtPos;
-      zeile[`${s.id}_ms`] = a.ms;
+      zeile[`${s.id}_position`] = a.position;
     });
     state.zeile = zeile;
     zeige("s-ergebnis");

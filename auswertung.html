@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Auswertung Echt oder Fake</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 <style>
   .wrap { max-width: 880px; }
   .login { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -63,7 +63,7 @@
   <div id="inhalt" class="stack-lg"></div>
 </main>
 
-<script src="config.js?v=3"></script>
+<script src="config.js?v=4"></script>
 <script>
 (() => {
   const C = window.UMFRAGE_CONFIG;
@@ -121,11 +121,7 @@
     for (let n = 0; n < 160; n++) {
       const a = Math.floor(Math.random() * C.alter.length);
       const s = Math.floor(Math.random() * C.screentime.length);
-      const row = {
-        alter: C.alter[a], screentime: C.screentime[s],
-        selbsteinschaetzung: 1 + Math.floor(Math.random() * 5),
-        merkmale: C.merkmale.filter(() => Math.random() < 0.35).join(", ") || C.merkmale[6]
-      };
+      const row = { alter: C.alter[a], screentime: C.screentime[s] };
       let r = 0, f = 0, k = 0;
       S.forEach((sz) => {
         const p = Math.max(0.15, Math.min(0.97, schw[sz.schwierigkeit] - 0.03 * s + (a === 5 ? -0.06 : 0) + (Math.random() - 0.5) * 0.15));
@@ -203,8 +199,8 @@
     });
 
     const stufen = ["leicht", "mittel", "schwer"];
-    const schwierigkeit = tabelle(C.screentime, stufen, (st, stufe) => {
-      const g = alle.filter((x) => x.row.screentime === st && x.szenario.schwierigkeit === stufe);
+    const schwierigkeit = (feld, werte) => tabelle(werte, stufen, (w, stufe) => {
+      const g = alle.filter((x) => x.row[feld] === w && x.szenario.schwierigkeit === stufe);
       return { v: anteilRichtig(g), n: new Set(g.map((x) => x.row)).size };
     });
 
@@ -212,11 +208,6 @@
       const g = sicher.filter((x) => x.row.screentime === st);
       return { label: st, n: new Set(g.map((x) => x.row)).size, wert: anteilRichtig(g) };
     });
-
-    const merkmale = C.merkmale.map((m) => {
-      const n = rows.filter((r) => String(r.merkmale || "").split(", ").includes(m)).length;
-      return { label: m, n, wert: (n / rows.length) * 100 };
-    }).sort((a, b) => b.wert - a.wert);
 
     const proSzenario = S.map((s) => {
       const g = alle.filter((x) => x.szenario.id === s.id);
@@ -251,26 +242,20 @@
       </section>
 
       <section class="block">
-        <h2>Leichte und schwere Fälschungen</h2>
-        <p class="muted small">Leicht: Fake mit vielen typischen Merkmalen (Großbuchstaben, Emojis, Ausrufezeichen). Schwer: Fake sachlich formuliert, die echte Meldung als Social-Media-Post.</p>
-        ${schwierigkeit}
+        <h2>Leichte und schwere Fälschungen nach Social-Media-Zeit</h2>
+        <p class="muted small">Leicht: Fake mit vielen typischen Merkmalen (Großbuchstaben, Ausrufezeichen, Emojis). Mittel: einige Merkmale. Schwer: kaum Merkmale, nur der Inhalt ist verdreht. Je 5 Paare.</p>
+        ${schwierigkeit("screentime", C.screentime)}
+      </section>
+
+      <section class="block">
+        <h2>Leichte und schwere Fälschungen nach Alter</h2>
+        ${schwierigkeit("alter", C.alter)}
       </section>
 
       <section class="block">
         <h2>Wie oft lagen die „Sicheren“ richtig?</h2>
         <p class="muted small">Nur Antworten mit „da bin ich sicher“. Ein niedriger Wert bedeutet Selbstüberschätzung.</p>
         ${balken(kalibrierung, false)}
-      </section>
-
-      <section class="block">
-        <h2>Selbsteinschätzung und Ergebnis</h2>
-        ${balken(gruppe(rows, "selbsteinschaetzung", [1, 2, 3, 4, 5]).map((d) => ({ ...d, label: `sagt ${d.label} von 5` })))}
-      </section>
-
-      <section class="block">
-        <h2>Worauf die Leute geachtet haben</h2>
-        <p class="muted small">Anteil der Teilnehmenden, die das Merkmal genannt haben.</p>
-        ${balken(merkmale, false)}
       </section>
 
       <section class="block">
