@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,700&display=swap">
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 <main class="wrap">
@@ -102,11 +102,10 @@
     <div class="panel stack">
       <h3>Woran man Fake News oft erkennt</h3>
       <ul class="tips">
-        <li>Unbekannter Absender, keine Quelle, kein Link</li>
-        <li>Großbuchstaben, viele Ausrufezeichen, viele Emojis</li>
-        <li>Wertende Wörter wie „Abzocke“ oder „Die Medien lügen“</li>
-        <li>Aufrufe wie „Teilen, bevor es gelöscht wird!“</li>
-        <li>Aber Vorsicht: Auch sachlich geschriebene Texte können falsch sein. Im Zweifel bei seriösen Medien nachsehen.</li>
+        <li>Seriöse Aufmachung heißt nicht, dass etwas stimmt. Ein lockerer Post kann trotzdem richtig sein.</li>
+        <li>Klingt eine Zahl oder Folge übertrieben? Oft ist nur ein Detail verdreht.</li>
+        <li>Aufrufe wie „Teilt das!“ oder „Keiner berichtet darüber“ sind ein Warnsignal.</li>
+        <li>Im Zweifel bei mehreren bekannten Medien nachsehen, ob sie dasselbe berichten.</li>
       </ul>
     </div>
     <p class="muted small">Danke fürs Mitmachen! Bitte verrate die Lösungen nicht an Leute, die noch teilnehmen.</p>
@@ -114,7 +113,7 @@
 
 </main>
 
-<script src="config.js?v=4"></script>
+<script src="config.js?v=5"></script>
 <script>
 (() => {
   const C = window.UMFRAGE_CONFIG;
@@ -248,11 +247,10 @@
     const paar = $("#paar");
     paar.innerHTML = "";
     [["A", oben], ["B", unten]].forEach(([buchstabe, meldung]) => {
-      const format = meldung === s.echt ? "artikel" : "post";
       const box = el("div", "karte");
       const label = el("div", "karte-label");
       label.append(el("i", null, buchstabe), document.createTextNode(`Meldung ${buchstabe}`));
-      box.append(label, karte(meldung, format));
+      box.append(label, karte(meldung, meldung.format));
       paar.appendChild(box);
     });
     state.auswahl = null;
@@ -317,9 +315,6 @@
       box.append(row);
       box.append(el("p", "zitat", s.fake.titel || s.fake.text));
       box.append(el("p", "small", s.aufloesung));
-      const tags = el("div", "tags");
-      s.fake.merkmale.forEach((t) => tags.append(el("span", "tag", t)));
-      box.append(tags);
       review.appendChild(box);
     });
 
