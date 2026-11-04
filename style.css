@@ -159,6 +159,17 @@ legend .hint { font: 400 0.88rem var(--body); color: var(--muted); display: bloc
 .post p { font-size: 0.98rem; }
 .post .reaktionen { display: flex; gap: 18px; font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 
+/* KI-Siegel, wie es Plattformen und Nachrichtenseiten verwenden */
+.ki-siegel {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.75rem; color: var(--muted);
+  border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px 2px 3px;
+}
+.ki-siegel i {
+  font: 800 0.62rem/1 var(--display); font-style: normal; letter-spacing: 0.04em;
+  background: var(--muted); color: var(--surface); border-radius: 3px; padding: 3px 4px;
+}
+
 /* Antwortmöglichkeiten */
 .antworten { display: flex; flex-direction: column; gap: 8px; }
 .antwort {

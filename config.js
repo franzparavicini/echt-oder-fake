@@ -36,6 +36,9 @@ window.UMFRAGE_CONFIG = {
     manipulation: "Versteckte Manipulation"
   },
 
+  // KI-Siegel: Bei zwei Szenarien trägt eine Version ein „Mit KI erstellt“-Siegel.
+  //   ki: "fake" = Siegel am Fake (s4), ki: "echt" = Siegel an der echten Meldung (Falle, s5)
+
   // Erfundene Medien: Tagesbote, Rundschau Kompakt, Lupe Nachrichten, Nordblick Online.
   // Jedes taucht gleich oft bei echten und bei falschen Meldungen auf.
   szenarien: [
@@ -68,22 +71,22 @@ window.UMFRAGE_CONFIG = {
       aufloesung: "Der Account klingt offiziell, aber bei einer Verlosung muss man nie Bankdaten per Direktnachricht schicken oder eine Gebühr zahlen. Das ist ein typischer Betrugsversuch."
     },
     {
-      id: "s4", thema: "Wolf gesichtet", typ: "quelle", merkmal: "widerspruch",
+      id: "s4", thema: "Wolf gesichtet", typ: "quelle", merkmal: "widerspruch", ki: "fake",
       echt: { format: "artikel", absender: "Nordblick Online", rubrik: "Region", datum: "Heute, 11:30",
         titel: "Wolf bei Wallhausen fotografiert",
         text: "Ein Spaziergänger hat am Sonntag am Waldrand bei Wallhausen einen Wolf fotografiert. Das Landesamt für Umwelt hat das Foto geprüft und geht von einem einzelnen jungen Tier auf der Durchreise aus. Hunde sollten im Wald vorerst an der Leine bleiben." },
-      fake: { format: "post", absender: "wallhausen.heute", datum: "vor 3 Std.", likes: "2.115", shares: "877",
+      fake: { format: "post", absender: "wallhausen.heute", datum: "vor 3 Std.", ki: true, likes: "2.115", shares: "877",
         text: "Wolf bei Wallhausen gesichtet 🐺 Das Landesamt hat bestätigt, dass es ein einzelnes Tier auf der Durchreise ist. Das Rudel hat sich inzwischen fest im Wald angesiedelt, Kinder sollten dort nicht mehr allein spielen." },
-      aufloesung: "Erst ist es ein einzelnes Tier auf der Durchreise, im nächsten Satz ein Rudel, das sich fest angesiedelt hat. Beides kann nicht stimmen."
+      aufloesung: "Erst ist es ein einzelnes Tier auf der Durchreise, im nächsten Satz ein Rudel, das sich fest angesiedelt hat. Beides kann nicht stimmen. Das KI-Siegel passte hier zum Fake, war aber nicht der eigentliche Beweis."
     },
     {
-      id: "s5", thema: "Butterpreis", typ: "quelle", merkmal: "rechnung",
-      echt: { format: "artikel", absender: "Tagesbote", rubrik: "Verbraucher", datum: "Heute, 08:20",
+      id: "s5", thema: "Butterpreis", typ: "quelle", merkmal: "rechnung", ki: "echt",
+      echt: { format: "artikel", absender: "Tagesbote", rubrik: "Verbraucher", datum: "Heute, 08:20", ki: true,
         titel: "Butter wird etwas günstiger",
         text: "Ein Päckchen Markenbutter kostet in vielen Supermärkten seit Montag 2,19 Euro statt 2,39 Euro. Grund seien gesunkene Großhandelspreise für Milch, teilte der Handelsverband Nordland mit. Ob die Preise weiter sinken, sei noch offen." },
       fake: { format: "post", absender: "preis.radar", datum: "vor 5 Std.", likes: "1.903", shares: "430",
         text: "Butter wird billiger 🧈 Statt 2,39 € kostet das Päckchen jetzt nur noch 2,19 €. Das ist fast die Hälfte weniger. Es lohnt sich also, mehrere Päckchen zu kaufen und einzufrieren." },
-      aufloesung: "20 Cent weniger sind keine „fast die Hälfte“. Die Hälfte von 2,39 € wären rund 1,20 €."
+      aufloesung: "20 Cent weniger sind keine „fast die Hälfte“. Die Hälfte von 2,39 € wären rund 1,20 €. Die Falle: Die echte Meldung war mit KI erstellt. Ein KI-Siegel heißt nicht, dass der Inhalt falsch ist."
     },
 
     // ---------- Gleiche Aufmachung ----------

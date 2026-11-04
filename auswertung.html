@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Auswertung Echt oder Fake</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
-<link rel="stylesheet" href="style.css?v=8">
+<link rel="stylesheet" href="style.css?v=9">
 <style>
   .wrap { max-width: 880px; }
   .login { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -63,7 +63,7 @@
   <div id="inhalt" class="stack-lg"></div>
 </main>
 
-<script src="config.js?v=8"></script>
+<script src="config.js?v=9"></script>
 <script>
 (() => {
   const C = window.UMFRAGE_CONFIG;
@@ -171,9 +171,9 @@
     return `background:hsl(${Math.round(6 + t * 140)} 55% 46%);color:#fff`;
   }
 
-  function tabelle(zeilen, spalten, wert) {
+  function tabelle(zeilen, spalten, wert, labels = {}) {
     return `<div class="scroll"><table>
-      <thead><tr><th></th>${spalten.map((s) => `<th>${esc(C.typen[s] || C.merkmale[s] || s)}</th>`).join("")}</tr></thead>
+      <thead><tr><th></th>${spalten.map((s) => `<th>${esc(labels[s] || s)}</th>`).join("")}</tr></thead>
       <tbody>${zeilen.map((z) => `<tr><th>${esc(z)}</th>${spalten.map((s) => {
         const { v, n } = wert(z, s);
         if (!n) return `<td class="cell leer">–</td>`;
@@ -202,7 +202,7 @@
     const kreuz = (feld, werte, eigenschaft, spalten) => tabelle(werte, Object.keys(spalten), (w, k) => {
       const g = alle.filter((x) => x.row[feld] === w && x.szenario[eigenschaft] === k);
       return { v: anteilRichtig(g), n: new Set(g.map((x) => x.row)).size };
-    });
+    }, spalten);
     const anzahlProMerkmal = Object.keys(C.merkmale).map((m) => `${C.merkmale[m]}: ${S.filter((s) => s.merkmal === m).length}`).join(" · ");
 
     const kalibrierung = C.screentime.map((st) => {
@@ -271,11 +271,18 @@
       </section>
 
       <section class="block">
+        <h2>KI-Siegel</h2>
+        <p class="muted small">Bei „Wolf“ trägt der Fake ein „Mit KI erstellt“-Siegel, bei „Butterpreis“ die echte Meldung. Wer KI-Inhalte pauschal für falsch hält, liegt beim Wolf richtig und beim Butterpreis falsch.</p>
+        ${kreuz("screentime", C.screentime, "id", Object.fromEntries(S.filter((s) => s.ki).map((s) => [s.id, `${s.thema} (Siegel am ${s.ki === "fake" ? "Fake" : "echten Text"})`])))}
+        ${kreuz("alter", C.alter, "id", Object.fromEntries(S.filter((s) => s.ki).map((s) => [s.id, `${s.thema} (Siegel am ${s.ki === "fake" ? "Fake" : "echten Text"})`])))}
+      </section>
+
+      <section class="block">
         <h2>Die einzelnen Paare</h2>
         <div class="legende"><span><i class="seg-ok"></i>richtig</span><span><i class="seg-no"></i>falsch</span><span><i class="seg-na"></i>keine Ahnung</span></div>
         <div class="bars">${proSzenario.map((d) => `
           <div class="bar-row">
-            <span>${esc(d.s.thema)} <small class="muted">(${esc(C.typen[d.s.typ])}, ${esc(C.merkmale[d.s.merkmal])})</small></span>
+            <span>${esc(d.s.thema)} <small class="muted">(${esc(C.typen[d.s.typ])}, ${esc(C.merkmale[d.s.merkmal])}${d.s.ki ? `, KI-Siegel am ${d.s.ki === "fake" ? "Fake" : "echten Text"}` : ""})</small></span>
             <div class="track"><div class="seg-ok" style="width:${d.ok}%"></div><div class="seg-no" style="width:${d.no}%"></div><div class="seg-na" style="width:${d.na}%"></div></div>
             <span class="val">${Math.round(d.ok)} %<small>n = ${d.n}</small></span>
           </div>`).join("")}</div>
