@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Auswertung Echt oder Fake</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
-<link rel="stylesheet" href="style.css?v=9">
+<link rel="stylesheet" href="style.css?v=10">
 <style>
   .wrap { max-width: 880px; }
   .login { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -63,7 +63,7 @@
   <div id="inhalt" class="stack-lg"></div>
 </main>
 
-<script src="config.js?v=9"></script>
+<script src="config.js?v=10"></script>
 <script>
 (() => {
   const C = window.UMFRAGE_CONFIG;
@@ -84,7 +84,8 @@
       const d = await r.json();
       if (!d.ok) { $("#status").textContent = d.error || "Fehler beim Laden."; clearInterval(timer); return; }
       $("#status").textContent = `Live · aktualisiert ${new Date().toLocaleTimeString("de-DE")} · lädt jede Minute neu`;
-      render(d.rows, false);
+      // Testzeilen (Alter „TEST“) nicht mitzählen
+      render(d.rows.filter((r) => r.alter !== "TEST"), false);
     } catch (err) {
       $("#status").textContent = "Laden fehlgeschlagen. Internetverbindung oder endpoint-URL prüfen.";
     }

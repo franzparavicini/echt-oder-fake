@@ -9,7 +9,7 @@
 // ============================================================
 window.UMFRAGE_CONFIG = {
   // URL der Google-Apps-Script-Web-App (endet auf /exec). Leer = Testmodus.
-  endpoint: "",
+  endpoint: "https://script.google.com/macros/s/AKfycbwoyTjQGCJTz1L7h0i9n8a7QnqClTbvXOOUl_BloYjk-2HOUrue5L1oLenHGPhVxbuh/exec",
 
   // SHA-256 des Zugangscodes aus dem QR-Code. Der Code selbst steht nur in ZUGANG.txt.
   zugangHash: "3fcbe4757b70a20cb7db7ed8bd194fc870028be3ef2ea5e7f1c15e11586b4125",
