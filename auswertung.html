@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Auswertung Echt oder Fake</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=6">
 <style>
   .wrap { max-width: 880px; }
   .login { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -63,7 +63,7 @@
   <div id="inhalt" class="stack-lg"></div>
 </main>
 
-<script src="config.js?v=5"></script>
+<script src="config.js?v=6"></script>
 <script>
 (() => {
   const C = window.UMFRAGE_CONFIG;
@@ -173,7 +173,7 @@
 
   function tabelle(zeilen, spalten, wert) {
     return `<div class="scroll"><table>
-      <thead><tr><th></th>${spalten.map((s) => `<th>${esc(C.typen[s] || s)}</th>`).join("")}</tr></thead>
+      <thead><tr><th></th>${spalten.map((s) => `<th>${esc(C.typen[s] || C.merkmale[s] || s)}</th>`).join("")}</tr></thead>
       <tbody>${zeilen.map((z) => `<tr><th>${esc(z)}</th>${spalten.map((s) => {
         const { v, n } = wert(z, s);
         if (!n) return `<td class="cell leer">–</td>`;
@@ -198,11 +198,12 @@
       return { v: mittel(g.map(quote)), n: g.length };
     });
 
-    const stufen = Object.keys(C.typen);
-    const schwierigkeit = (feld, werte) => tabelle(werte, stufen, (w, stufe) => {
-      const g = alle.filter((x) => x.row[feld] === w && x.szenario.typ === stufe);
+    // Kreuztabelle: Gruppe (Alter oder Screentime) × Eigenschaft der Szenarien (typ oder merkmal)
+    const kreuz = (feld, werte, eigenschaft, spalten) => tabelle(werte, Object.keys(spalten), (w, k) => {
+      const g = alle.filter((x) => x.row[feld] === w && x.szenario[eigenschaft] === k);
       return { v: anteilRichtig(g), n: new Set(g.map((x) => x.row)).size };
     });
+    const anzahlProMerkmal = Object.keys(C.merkmale).map((m) => `${C.merkmale[m]}: ${S.filter((s) => s.merkmal === m).length}`).join(" · ");
 
     const kalibrierung = C.screentime.map((st) => {
       const g = sicher.filter((x) => x.row.screentime === st);
@@ -243,13 +244,24 @@
 
       <section class="block">
         <h2>Aufmachung als Hinweis, nach Social-Media-Zeit</h2>
-        <p class="muted small">Aufmachung hilft: echt = seriöser Artikel, Fake = reißerischer Post. Nur der Inhalt zählt: beide sehen gleich aus. Aufmachung täuscht: echt = lockerer Post, Fake = seriöser Artikel. Je 5 Paare. Wer sich vor allem auf die Quelle verlässt, schneidet bei „täuscht“ schlecht ab.</p>
-        ${schwierigkeit("screentime", C.screentime)}
+        <p class="muted small">Aufmachung hilft: echt = seriöser Artikel, Fake = Post. Gleiche Aufmachung: beide sehen gleich aus. Aufmachung täuscht: echt = lockerer Post, Fake = seriös wirkender Artikel. Je 5 Paare. Wer sich vor allem auf die Aufmachung verlässt, schneidet bei „täuscht“ schlecht ab.</p>
+        ${kreuz("screentime", C.screentime, "typ", C.typen)}
       </section>
 
       <section class="block">
         <h2>Aufmachung als Hinweis, nach Alter</h2>
-        ${schwierigkeit("alter", C.alter)}
+        ${kreuz("alter", C.alter, "typ", C.typen)}
+      </section>
+
+      <section class="block">
+        <h2>Welche Fake-Merkmale werden erkannt? Nach Social-Media-Zeit</h2>
+        <p class="muted small">Jedes Paar hat ein Hauptmerkmal, an dem man den Fake erkennen kann. Anzahl Paare: ${esc(anzahlProMerkmal)}.</p>
+        ${kreuz("screentime", C.screentime, "merkmal", C.merkmale)}
+      </section>
+
+      <section class="block">
+        <h2>Welche Fake-Merkmale werden erkannt? Nach Alter</h2>
+        ${kreuz("alter", C.alter, "merkmal", C.merkmale)}
       </section>
 
       <section class="block">
@@ -263,7 +275,7 @@
         <div class="legende"><span><i class="seg-ok"></i>richtig</span><span><i class="seg-no"></i>falsch</span><span><i class="seg-na"></i>keine Ahnung</span></div>
         <div class="bars">${proSzenario.map((d) => `
           <div class="bar-row">
-            <span>${esc(d.s.thema)} <small class="muted">(${esc(C.typen[d.s.typ])})</small></span>
+            <span>${esc(d.s.thema)} <small class="muted">(${esc(C.typen[d.s.typ])}, ${esc(C.merkmale[d.s.merkmal])})</small></span>
             <div class="track"><div class="seg-ok" style="width:${d.ok}%"></div><div class="seg-no" style="width:${d.no}%"></div><div class="seg-na" style="width:${d.na}%"></div></div>
             <span class="val">${Math.round(d.ok)} %<small>n = ${d.n}</small></span>
           </div>`).join("")}</div>

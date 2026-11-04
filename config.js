@@ -2,6 +2,10 @@
 //  Konfiguration der Umfrage
 //  Forschungsfrage: Wie unterscheiden Alter und Mediennutzung
 //  das Erkennen von Fake News im Internet?
+//
+//  Alle Meldungen sind für die Umfrage ausgedacht (erfundene Orte,
+//  Personen und Medien). So hilft Vorwissen nicht – man muss die
+//  Falschmeldung an ihren Merkmalen erkennen.
 // ============================================================
 window.UMFRAGE_CONFIG = {
   // URL der Google-Apps-Script-Web-App (endet auf /exec). Leer = Testmodus.
@@ -14,158 +18,163 @@ window.UMFRAGE_CONFIG = {
   alter: ["unter 16", "16–19", "20–29", "30–44", "45–59", "60+"],
   screentime: ["unter 30 Min.", "30–60 Min.", "1–2 Std.", "2–4 Std.", "über 4 Std."],
 
-  // Drei Typen mit je 5 Szenarien, damit die Quelle kein sicherer Hinweis ist:
-  //   quelle   = Aufmachung hilft: echt ist ein seriöser Artikel, Fake ein reißerischer Post
-  //   inhalt   = Nur der Inhalt zählt: beide Versionen haben dieselbe Aufmachung
-  //   taeuscht = Aufmachung täuscht: echt ist ein lockerer Post, Fake ein sachlicher Artikel
+  // Wie die Aufmachung zur Lösung steht (je 5 Szenarien)
   typen: {
-    quelle: "Aufmachung hilft",
-    inhalt: "Nur der Inhalt zählt",
-    taeuscht: "Aufmachung täuscht"
+    quelle: "Aufmachung hilft",       // echt = seriöser Artikel, Fake = Post
+    inhalt: "Gleiche Aufmachung",     // beide gleich aufgemacht, nur der Inhalt verrät den Fake
+    taeuscht: "Aufmachung täuscht"    // echt = lockerer Post, Fake = seriös wirkender Artikel
   },
 
-  // format: "artikel" (Nachrichtenseite) oder "post" (Social Media).
-  // Alle Absender sind erfunden. Dieselben Nachrichtenseiten tauchen mal echt, mal falsch auf.
-  // Reihenfolge und Position (A/B) werden pro Person ausgelost.
+  // Woran man den Fake erkennen kann (ohne Vorwissen)
+  merkmale: {
+    stil: "Reißerischer Stil",
+    angst: "Angstmache und Verschwörung",
+    zuschoen: "Zu schön, um wahr zu sein",
+    vage: "Vage Quelle, fehlende Details",
+    widerspruch: "Widerspruch im Text"
+  },
+
+  // Erfundene Medien: Tagesbote, Rundschau Kompakt, Lupe Nachrichten, Nordblick Online.
+  // Jedes taucht gleich oft bei echten und bei falschen Meldungen auf.
   szenarien: [
-    // ---------- Typ: Aufmachung hilft ----------
+    // ---------- Aufmachung hilft ----------
     {
-      id: "s2", thema: "Deutschlandticket", typ: "quelle",
-      echt: { format: "artikel", absender: "Rundschau Kompakt", rubrik: "Verkehr", datum: "01.05.2023",
-        titel: "Deutschlandticket startet: Nahverkehr für 49 Euro im Monat",
-        text: "Seit heute gilt das Deutschlandticket. Für 49 Euro im Monat können Busse und Bahnen im Nah- und Regionalverkehr in ganz Deutschland genutzt werden. Das Ticket ist ein monatlich kündbares Abo." },
-      fake: { format: "post", absender: "newsdaily.de", datum: "01.05.2023", likes: "18.204", shares: "6.950",
-        text: "Das Deutschlandticket startet heute – und für alle unter 25 ist es komplett kostenlos! 🎉 Einfach Ausweis zeigen, ein Abo braucht ihr nicht. Teilt das mit euren Freunden!" },
-      aufloesung: "Das Deutschlandticket startete am 1. Mai 2023 für 49 € im Monat. Eine kostenlose Version für unter 25-Jährige gab es nie."
+      id: "s1", thema: "Handyverbot an Schulen", typ: "quelle", merkmal: "stil",
+      echt: { format: "artikel", absender: "Lupe Nachrichten", rubrik: "Bildung", datum: "Heute, 07:45",
+        titel: "Gymnasium in Bergstedt testet handyfreie Pausen",
+        text: "Am Lessing-Gymnasium in Bergstedt bleiben Smartphones ab Montag in den Pausen in der Tasche. Der Versuch läuft zunächst bis zu den Sommerferien, sagte Schulleiterin Anja Krämer. Danach entscheiden Schülervertretung und Eltern gemeinsam, ob die Regel bleibt." },
+      fake: { format: "post", absender: "schulnews.krass", datum: "vor 2 Std.", likes: "6.412", shares: "2.390",
+        text: "ALLE Schulen verbieten ab Montag Handys!!! 📵😡 Wer erwischt wird, fliegt sofort von der Schule. Teilt das, bevor es gelöscht wird!!" },
+      aufloesung: "Großbuchstaben, viele Ausrufezeichen, Emojis und „Teilt das, bevor es gelöscht wird“ sind typische Merkmale von Falschmeldungen. Die seriöse Meldung nennt eine konkrete Schule und eine Ansprechpartnerin."
     },
     {
-      id: "s5", thema: "Social Media in Australien", typ: "quelle",
-      echt: { format: "artikel", absender: "Lupe Nachrichten", rubrik: "Digitales", datum: "10.12.2025",
-        titel: "Australien: Social-Media-Konten erst ab 16 Jahren",
-        text: "Ab heute dürfen Kinder und Jugendliche unter 16 Jahren in Australien keine eigenen Konten mehr auf Plattformen wie TikTok, Instagram und Snapchat haben. Die Anbieter müssen das Alter prüfen, sonst drohen hohe Strafen." },
-      fake: { format: "post", absender: "wach.auf.leute", datum: "10.12.2025", likes: "14.392", shares: "6.051",
-        text: "Australien sperrt ab heute TikTok und Instagram für ALLE, egal wie alt 🚫📱 Als Nächstes sind wir dran!" },
-      aufloesung: "Das Verbot gilt nur für Konten von unter 16-Jährigen. Erwachsene können die Plattformen weiter nutzen."
+      id: "s2", thema: "Energydrinks", typ: "quelle", merkmal: "angst",
+      echt: { format: "artikel", absender: "Tagesbote", rubrik: "Gesundheit", datum: "Heute, 10:12",
+        titel: "Umfrage: Fast jeder fünfte Jugendliche trinkt regelmäßig Energydrinks",
+        text: "In einer Befragung des Instituts für Jugendgesundheit Halden gaben 18 Prozent der 1.200 befragten 14- bis 17-Jährigen an, mehrmals pro Woche Energydrinks zu trinken. Die Forschenden empfehlen, den Verkauf an Minderjährige stärker zu kontrollieren." },
+      fake: { format: "post", absender: "gesund.leben.wahrheit", datum: "vor 4 Std.", likes: "5.877", shares: "3.104",
+        text: "Ärzte schlagen Alarm 🚨 Schon EIN Energydrink kann dein Herz für immer schädigen! Die Getränkeindustrie will nicht, dass du das weißt. Teilen!" },
+      aufloesung: "„Ärzte“ ohne Namen, Angst („für immer schädigen“) und „die Industrie will nicht, dass du das weißt“ sind Warnsignale. Die seriöse Meldung nennt Institut, Zahl der Befragten und das genaue Ergebnis."
     },
     {
-      id: "s8", thema: "Wärmstes Jahr", typ: "quelle",
-      echt: { format: "artikel", absender: "Tagesbote", rubrik: "Wissen", datum: "10.01.2025",
-        titel: "2024 war das wärmste Jahr seit Beginn der Messungen",
-        text: "Nach Daten des EU-Klimadienstes Copernicus lag die weltweite Durchschnittstemperatur 2024 rund 1,6 Grad über dem vorindustriellen Niveau. Es ist das erste Kalenderjahr, in dem die Marke von 1,5 Grad überschritten wurde." },
-      fake: { format: "post", absender: "die.wahrheit.jetzt", datum: "10.01.2025", likes: "9.874", shares: "4.215",
-        text: "2024 war das kälteste Jahr seit 100 Jahren ❄️ Steht so in den neuen Messdaten, aber kaum jemand berichtet darüber. Warum wohl?" },
-      aufloesung: "Laut Copernicus war 2024 das wärmste Jahr seit Beginn der Aufzeichnungen."
+      id: "s3", thema: "Bahn-Gewinnspiel", typ: "quelle", merkmal: "zuschoen",
+      echt: { format: "artikel", absender: "Rundschau Kompakt", rubrik: "Verkehr", datum: "Heute, 09:03",
+        titel: "Regionalbahn zwischen Halden und Bergstedt fährt bald stündlich",
+        text: "Ab dem Fahrplanwechsel im Dezember fährt die Regionalbahn zwischen Halden und Bergstedt im Stundentakt statt alle zwei Stunden. Das teilte der Verkehrsverbund Nordland mit. Die Fahrzeit bleibt bei rund 40 Minuten." },
+      fake: { format: "post", absender: "bahn.deals.gratis", datum: "vor 1 Std.", likes: "7.020", shares: "4.488",
+        text: "🎁 Zum Fahrplanwechsel verschenkt die Bahn 10.000 Jahrestickets! Einfach diesen Beitrag teilen und deine Kontodaten per DM schicken. Nur noch heute! ⏰" },
+      aufloesung: "Geschenke, Zeitdruck („nur noch heute“) und die Bitte um Kontodaten sind klassische Merkmale von Betrug. Kein Unternehmen fragt Kontodaten über Direktnachrichten ab."
     },
     {
-      id: "s10", thema: "Physik-Nobelpreis", typ: "quelle",
-      echt: { format: "artikel", absender: "Nordblick Online", rubrik: "Wissenschaft", datum: "08.10.2024",
-        titel: "Physik-Nobelpreis für Grundlagen des maschinellen Lernens",
-        text: "Der Nobelpreis für Physik geht in diesem Jahr an John Hopfield und Geoffrey Hinton. Sie werden für Entdeckungen ausgezeichnet, die maschinelles Lernen mit künstlichen neuronalen Netzen möglich gemacht haben." },
-      fake: { format: "post", absender: "tech.krass", datum: "08.10.2024", likes: "21.660", shares: "7.120",
-        text: "Zum ersten Mal geht ein Nobelpreis an eine KI 🤖🏆 ChatGPT wird für seine Beiträge zur Physik ausgezeichnet. Krass, oder?!" },
-      aufloesung: "Ausgezeichnet wurden zwei Forscher, deren Arbeit die Grundlage für heutige KI legte, nicht eine KI selbst."
+      id: "s4", thema: "Wolf gesichtet", typ: "quelle", merkmal: "stil",
+      echt: { format: "artikel", absender: "Nordblick Online", rubrik: "Region", datum: "Heute, 11:30",
+        titel: "Wolf bei Wallhausen gesichtet",
+        text: "Ein Spaziergänger hat am Sonntag am Waldrand bei Wallhausen einen Wolf fotografiert. Das Landesamt für Umwelt hat das Foto geprüft und bestätigt. Eine Gefahr für Menschen bestehe nach bisherigen Erkenntnissen nicht, sagte ein Sprecher. Hunde sollten im Wald an der Leine bleiben." },
+      fake: { format: "post", absender: "heimat.alarm", datum: "vor 3 Std.", likes: "6.115", shares: "3.877",
+        text: "WOLFSRUDEL greift Kinder in Wallhausen an!!! 🐺😱 Lasst eure Kinder NICHT mehr raus, die Behörden tun mal wieder NICHTS!!" },
+      aufloesung: "Großbuchstaben, Ausrufezeichen und Panikmache ohne Quelle. Die seriöse Meldung sagt, wer das Foto geprüft hat, und gibt eine sachliche Einschätzung."
     },
     {
-      id: "s13", thema: "Brückeneinsturz Dresden", typ: "quelle",
-      echt: { format: "artikel", absender: "Rundschau Kompakt", rubrik: "Regional", datum: "11.09.2024",
-        titel: "Dresden: Teil der Carolabrücke eingestürzt",
-        text: "In der Nacht ist in Dresden ein Teil der Carolabrücke in die Elbe gestürzt. Verletzt wurde nach Angaben der Feuerwehr niemand. Kurz zuvor war noch eine Straßenbahn über die Brücke gefahren." },
-      fake: { format: "post", absender: "insider.ost", datum: "11.09.2024", likes: "7.316", shares: "5.982",
-        text: "Brücke in Dresden eingestürzt, während eine Straßenbahn drüberfuhr 😱 Es soll viele Verletzte geben, offiziell sagt mal wieder keiner was." },
-      aufloesung: "Die Carolabrücke stürzte am 11. September 2024 teilweise ein. Es saß keine Bahn darauf und niemand wurde verletzt."
-    },
-
-    // ---------- Typ: Nur der Inhalt zählt ----------
-    {
-      id: "s1", thema: "USB-C-Pflicht", typ: "inhalt",
-      echt: { format: "post", absender: "kurz.und.klar", datum: "28.12.2024", likes: "4.812", shares: "1.233",
-        text: "Ab heute gilt in der EU: Neue Smartphones, Tablets und Kopfhörer müssen per USB-C geladen werden können 🔌 Bereits gekaufte Geräte und alte Kabel darf man weiter benutzen." },
-      fake: { format: "post", absender: "infopunkt.de", datum: "28.12.2024", likes: "5.307", shares: "1.590",
-        text: "Ab heute gilt in der EU: Smartphones dürfen nur noch per USB-C geladen werden 🔌 Wer weiter ein altes Lightning-Kabel benutzt, riskiert ein Bußgeld von bis zu 100 Euro." },
-      aufloesung: "Die EU schreibt USB-C nur für neu verkaufte Geräte vor. Alte Kabel darf man weiter benutzen, ein Bußgeld gibt es nicht."
-    },
-    {
-      id: "s3", thema: "Glücksstudie", typ: "inhalt",
-      echt: { format: "artikel", absender: "Lupe Nachrichten", rubrik: "Gesellschaft", datum: "20.03.2024",
-        titel: "Weltglücksbericht: Deutschland fällt auf Platz 24",
-        text: "Finnland liegt im World Happiness Report zum siebten Mal in Folge auf Platz eins. Deutschland rutscht von Rang 16 auf Rang 24 und ist damit nicht mehr unter den besten 20 Ländern." },
-      fake: { format: "artikel", absender: "Tagesbote", rubrik: "Gesellschaft", datum: "20.03.2024",
-        titel: "Weltglücksbericht: Deutschland landet auf dem letzten Platz in Europa",
-        text: "Finnland liegt im World Happiness Report zum siebten Mal in Folge auf Platz eins. Deutschland stürzt dagegen ab und landet hinter allen anderen europäischen Ländern auf dem letzten Platz." },
-      aufloesung: "Deutschland fiel 2024 auf Platz 24 weltweit, lag aber noch vor vielen anderen europäischen Ländern."
-    },
-    {
-      id: "s6", thema: "Pfand", typ: "inhalt",
-      echt: { format: "post", absender: "nachrichten.kompakt", datum: "01.01.2022", likes: "3.940", shares: "870",
-        text: "Neu ab heute ♻️ Auch auf Saftflaschen aus Plastik und auf alle Getränkedosen gibt es jetzt 25 Cent Pfand. Für Milchgetränke gilt eine Übergangsfrist bis 2024." },
-      fake: { format: "post", absender: "kurz.und.klar", datum: "01.01.2022", likes: "4.118", shares: "1.025",
-        text: "Neu ab heute ♻️ Auch auf Glasflaschen gibt es jetzt Einwegpfand, und zwar 50 Cent pro Flasche. Für Wein und Spirituosen gilt eine Übergangsfrist bis 2024." },
-      aufloesung: "2022 wurde die Pfandpflicht auf Saftflaschen aus Plastik und alle Dosen ausgeweitet, mit 25 Cent. Ein neues 50-Cent-Pfand auf Glasflaschen gab es nicht."
-    },
-    {
-      id: "s12", thema: "Sonnenfinsternis", typ: "inhalt",
-      echt: { format: "post", absender: "himmels.blick", datum: "08.04.2024", likes: "2.981", shares: "730",
-        text: "Heute gibt es eine totale Sonnenfinsternis 🌑 Zu sehen ist sie in Mexiko, den USA und Kanada. In Deutschland bekommt man davon leider nichts mit." },
-      fake: { format: "post", absender: "nachrichten.kompakt", datum: "08.04.2024", likes: "3.402", shares: "811",
-        text: "Heute gibt es eine totale Sonnenfinsternis 🌑 Zu sehen ist sie in ganz Europa. Auch in Deutschland wird es gegen 20 Uhr für ein paar Minuten dunkel." },
-      aufloesung: "Die totale Sonnenfinsternis am 8. April 2024 war nur in Nordamerika zu sehen, nicht in Deutschland."
-    },
-    {
-      id: "s15", thema: "Fußball-EM 2024", typ: "inhalt",
-      echt: { format: "artikel", absender: "Tagesbote", rubrik: "Sport", datum: "14.07.2024",
-        titel: "Spanien ist Europameister",
-        text: "Spanien hat das EM-Finale in Berlin mit 2:1 gegen England gewonnen. Mit nun vier Titeln ist Spanien alleiniger Rekord-Europameister." },
-      fake: { format: "artikel", absender: "Lupe Nachrichten", rubrik: "Sport", datum: "14.07.2024",
-        titel: "England ist Europameister",
-        text: "England hat das EM-Finale in Berlin mit 2:1 gegen Spanien gewonnen. Es ist der erste große Titel seit der Weltmeisterschaft 1966." },
-      aufloesung: "Spanien gewann das Finale 2:1 gegen England. Der Fake vertauscht nur den Sieger, alles andere stimmt."
+      id: "s5", thema: "Butterpreis", typ: "quelle", merkmal: "vage",
+      echt: { format: "artikel", absender: "Tagesbote", rubrik: "Verbraucher", datum: "Heute, 08:20",
+        titel: "Butter wird etwas günstiger",
+        text: "Ein Päckchen Butter kostet in vielen Supermärkten seit dieser Woche 20 Cent weniger als im Vormonat. Grund seien gesunkene Großhandelspreise für Milch, teilte der Handelsverband Nordland mit." },
+      fake: { format: "post", absender: "spar.fuchs.24", datum: "vor 5 Std.", likes: "4.903", shares: "2.230",
+        text: "Butter bald für 10 Euro?! 🧈💸 Ab nächster Woche wird alles viel teurer, sagen Insider. Deckt euch JETZT ein, bevor es zu spät ist!" },
+      aufloesung: "„Insider“ ist keine überprüfbare Quelle. Dazu kommen eine Schockzahl und Zeitdruck. Die seriöse Meldung nennt den genauen Betrag und wer ihn mitgeteilt hat."
     },
 
-    // ---------- Typ: Aufmachung täuscht ----------
+    // ---------- Gleiche Aufmachung ----------
     {
-      id: "s4", thema: "Mondlandung Japan", typ: "taeuscht",
-      echt: { format: "post", absender: "sternwarte.erklaert", datum: "25.01.2024", likes: "3.118", shares: "412",
-        text: "Japans Mondsonde SLIM ist gelandet – aber kopfüber 🙃 JAXA hat heute das Foto gezeigt. Damit ist Japan das fünfte Land mit einer weichen Mondlandung!" },
-      fake: { format: "artikel", absender: "Rundschau Kompakt", rubrik: "Wissenschaft", datum: "25.01.2024",
-        titel: "Japanische Mondsonde bei Landung zerstört",
-        text: "Die japanische Mondsonde SLIM ist bei ihrem Landeversuch umgekippt und zerbrochen. Das zeigt ein Foto, das die Raumfahrtbehörde JAXA heute veröffentlicht hat. Das Mondprogramm des Landes ist vorerst gestoppt." },
-      aufloesung: "SLIM landete im Januar 2024 kopfüber, aber intakt, und funkte noch Daten. Hier war der lockere Post echt."
+      id: "s6", thema: "Freibad", typ: "inhalt", merkmal: "vage",
+      echt: { format: "post", absender: "stadt.halden.info", datum: "vor 2 Std.", likes: "1.284", shares: "211",
+        text: "Das Freibad Halden öffnet in diesem Jahr am 15. Mai, zwei Wochen später als sonst ☀️ Grund sind Reparaturen am Becken, teilen die Stadtwerke mit. Der Eintritt bleibt bei 4 Euro." },
+      fake: { format: "post", absender: "halden.aktuell", datum: "vor 2 Std.", likes: "1.502", shares: "348",
+        text: "Das Freibad Halden öffnet in diesem Jahr am 15. Mai ☀️ Wie ein Mitarbeiter verraten hat, steigt der Eintritt dann von 4 auf 25 Euro. Die Stadt will das wohl erst kurz vorher bekannt geben." },
+      aufloesung: "„Ein Mitarbeiter hat verraten“ und „wohl“ sind keine Belege, die Erhöhung auf das Sechsfache ist unrealistisch. Die echte Meldung nennt die Stadtwerke als Quelle."
     },
     {
-      id: "s7", thema: "Vogel des Jahrhunderts", typ: "taeuscht",
-      echt: { format: "post", absender: "vogelwelt.news", datum: "15.11.2023", likes: "2.540", shares: "388",
-        text: "Er hat's geschafft! 🐦 Der Puteketeke (Haubentaucher) ist Neuseelands „Vogel des Jahrhunderts“. Danke an John Oliver für die Mega-Kampagne 😄 Forest & Bird hat das Ergebnis bestätigt." },
-      fake: { format: "artikel", absender: "Nordblick Online", rubrik: "Panorama", datum: "15.11.2023",
-        titel: "Neuseeland annulliert Wahl zum „Vogel des Jahrhunderts“",
-        text: "Der Puteketeke hatte die Wahl mit großem Vorsprung gewonnen. Viele Stimmen kamen aus dem Ausland, nachdem der US-Moderator John Oliver weltweit für den Vogel geworben hatte. Der Veranstalter Forest & Bird erklärte das Ergebnis deshalb für ungültig." },
-      aufloesung: "Die Wahl wurde nicht annulliert, der Puteketeke ist offizieller Sieger. Der sachliche Artikel war hier der Fake."
+      id: "s7", thema: "Handy und Schlaf", typ: "inhalt", merkmal: "widerspruch",
+      echt: { format: "artikel", absender: "Lupe Nachrichten", rubrik: "Wissen", datum: "Heute, 06:50",
+        titel: "Studie: Wer abends lange am Handy ist, schläft etwas kürzer",
+        text: "Forschende der Universität Halden haben 2.000 Erwachsene zu ihren Schlafgewohnheiten befragt. Wer abends mehr als zwei Stunden am Smartphone war, schlief im Schnitt 20 Minuten kürzer. Ob das Handy die Ursache ist, lasse sich aus der Befragung nicht ableiten, sagt Studienleiterin Sarah Yilmaz." },
+      fake: { format: "artikel", absender: "Tagesbote", rubrik: "Wissen", datum: "Heute, 06:50",
+        titel: "Studie beweist: Handy am Abend halbiert den Schlaf",
+        text: "Forschende haben 2.000 Erwachsene zu ihren Schlafgewohnheiten befragt. Wer abends mehr als zwei Stunden am Smartphone war, schlief im Schnitt 20 Minuten kürzer. Damit ist bewiesen, dass das Handy den Schlaf halbiert." },
+      aufloesung: "Die Überschrift passt nicht zum Text: 20 Minuten weniger sind keine Halbierung. Außerdem „beweist“ eine Befragung keine Ursache. Die echte Meldung sagt genau das."
     },
     {
-      id: "s9", thema: "Mindestlohn", typ: "taeuscht",
-      echt: { format: "post", absender: "geld.tipps.24", datum: "01.01.2025", likes: "6.050", shares: "2.731",
-        text: "Mehr Geld ab heute 💶 Der Mindestlohn steigt von 12,41 € auf 12,82 € pro Stunde. Check mal, ob dein Arbeitgeber das auch umsetzt!" },
-      fake: { format: "artikel", absender: "Tagesbote", rubrik: "Wirtschaft", datum: "01.01.2025",
-        titel: "Mindestlohn steigt auf 15 Euro",
-        text: "Seit dem 1. Januar liegt der gesetzliche Mindestlohn in Deutschland bei 15 Euro pro Stunde. Bisher waren es 12,41 Euro. Die Erhöhung hatte die Mindestlohnkommission empfohlen." },
-      aufloesung: "Am 1. Januar 2025 stieg der Mindestlohn auf 12,82 €, nicht auf 15 €."
+      id: "s8", thema: "Rückruf Speiseeis", typ: "inhalt", merkmal: "vage",
+      echt: { format: "post", absender: "verbraucher.check", datum: "vor 6 Std.", likes: "2.735", shares: "1.906",
+        text: "Rückruf ⚠️ Eiswerk Nord ruft sein Vanilleeis in der 500-ml-Packung mit Haltbarkeitsdatum 12.08. zurück. Es könnten Plastikteile enthalten sein. Betroffen sind nur Märkte in Nordland. Das Geld gibt es im Laden zurück." },
+      fake: { format: "post", absender: "verbraucher.warnung", datum: "vor 6 Std.", likes: "3.118", shares: "2.640",
+        text: "Rückruf ⚠️ Alle Eissorten in deutschen Supermärkten sind betroffen! Es könnten Plastikteile enthalten sein. Welche Hersteller, wird noch nicht gesagt. Werft sicherheitshalber alles weg und teilt das!" },
+      aufloesung: "Ein echter Rückruf nennt Hersteller, Produkt und Haltbarkeitsdatum. „Alle Sorten, Hersteller unbekannt“ ist unglaubwürdig, dazu der Aufruf zum Teilen."
     },
     {
-      id: "s11", thema: "Olympia in Paris", typ: "taeuscht",
-      echt: { format: "post", absender: "sport.flash", datum: "26.07.2024", likes: "12.877", shares: "2.209",
-        text: "Was für eine Eröffnung!! 🚤🇫🇷 Die Teams sind auf Booten über die Seine gefahren, und trotz Dauerregen standen Hunderttausende am Ufer." },
-      fake: { format: "artikel", absender: "Lupe Nachrichten", rubrik: "Sport", datum: "26.07.2024",
-        titel: "Olympia-Eröffnung wegen Unwetter ins Stadion verlegt",
-        text: "Paris hat die Olympischen Sommerspiele eröffnet, allerdings nicht wie geplant auf der Seine. Wegen Dauerregens wurde die Bootsparade kurzfristig abgesagt und die Feier ins Stade de France verlegt." },
-      aufloesung: "Die Feier fand trotz Regen wie geplant auf der Seine statt."
+      id: "s9", thema: "Lkw-Unfall", typ: "inhalt", merkmal: "angst",
+      echt: { format: "artikel", absender: "Rundschau Kompakt", rubrik: "Region", datum: "Heute, 12:05",
+        titel: "B27: Umgekippter Lkw sorgt für langen Stau",
+        text: "Auf der B27 zwischen Halden und Bergstedt ist am Morgen ein Lkw umgekippt. Der Fahrer wurde leicht verletzt, sagte ein Polizeisprecher. Die Straße war bis 11 Uhr in beide Richtungen gesperrt." },
+      fake: { format: "artikel", absender: "Nordblick Online", rubrik: "Region", datum: "Heute, 12:05",
+        titel: "B27: Polizei verschweigt Zahl der Opfer nach Lkw-Unfall",
+        text: "Auf der B27 zwischen Halden und Bergstedt ist am Morgen ein Lkw umgekippt. Augenzeugen berichten von vielen Verletzten, die Polizei schweigt dazu. Offenbar soll die Zahl der Opfer nicht bekannt werden." },
+      aufloesung: "Unbenannte „Augenzeugen“ statt Polizei, Vermutungen („offenbar“) und der Vorwurf des Verschweigens ohne Beleg. Die echte Meldung zitiert die Polizei."
     },
     {
-      id: "s14", thema: "Taylor-Swift-Konzerte", typ: "taeuscht",
-      echt: { format: "post", absender: "swiftie.updates", datum: "07.08.2024", likes: "33.410", shares: "11.870",
-        text: "Die drei Wien-Konzerte sind abgesagt 💔 Die Polizei hat mutmaßliche Anschlagspläne aufgedeckt. Die Tour geht in London weiter, passt auf euch auf!" },
-      fake: { format: "artikel", absender: "Rundschau Kompakt", rubrik: "Kultur", datum: "07.08.2024",
-        titel: "Taylor Swift bricht Europa-Tournee ab",
-        text: "Nach mutmaßlichen Anschlagsplänen in Wien hat Taylor Swift alle restlichen Konzerte ihrer Europa-Tournee abgesagt, auch die geplanten Auftritte in London." },
-      aufloesung: "Abgesagt wurden nur die drei Konzerte in Wien. Die Tour ging danach in London weiter."
+      id: "s10", thema: "Abnehm-Trick", typ: "inhalt", merkmal: "zuschoen",
+      echt: { format: "post", absender: "gesundheit.kompakt", datum: "vor 3 Std.", likes: "2.204", shares: "517",
+        text: "Gut zu wissen 🥦 Ernährungsfachleute raten Erwachsenen zu etwa 30 Gramm Ballaststoffen am Tag. Die meisten erreichen das nicht, vor allem weil sie wenig Vollkorn, Gemüse und Hülsenfrüchte essen." },
+      fake: { format: "post", absender: "gesundheit.heute", datum: "vor 3 Std.", likes: "2.611", shares: "702",
+        text: "Gut zu wissen 🥦 Mit diesem einen Gemüse nimmst du in 7 Tagen 10 Kilo ab, ganz ohne Sport! Welches es ist, verraten wir im Link in der Bio 👇" },
+      aufloesung: "10 Kilo in einer Woche ohne Sport ist unrealistisch. Dass die Antwort nur über einen Link verraten wird, ist ein typischer Klick-Köder."
+    },
+
+    // ---------- Aufmachung täuscht ----------
+    {
+      id: "s11", thema: "Stadtfest abgesagt", typ: "taeuscht", merkmal: "vage",
+      echt: { format: "post", absender: "bergstedt.erleben", datum: "vor 1 Std.", likes: "988", shares: "403",
+        text: "Schade 😕 Das Stadtfest am Samstag fällt aus, weil der Wetterdienst eine Unwetterwarnung herausgegeben hat. Die Stadt sucht einen Ersatztermin im September, alle Infos auf der Website der Stadt." },
+      fake: { format: "artikel", absender: "Rundschau Kompakt", rubrik: "Region", datum: "Heute, 14:10",
+        titel: "Stadtfest Bergstedt abgesagt: Stadt offenbar pleite",
+        text: "Das Stadtfest am Samstag findet nicht statt. Wie aus gut informierten Kreisen verlautet, ist die Stadt Bergstedt praktisch pleite und kann sich die Veranstaltung nicht mehr leisten. Eine offizielle Bestätigung gibt es bisher nicht." },
+      aufloesung: "„Gut informierte Kreise“ und „keine offizielle Bestätigung“ heißt: Die Behauptung ist nicht belegt, auch wenn der Artikel seriös aussieht. Der lockere Post nennt einen nachprüfbaren Grund."
+    },
+    {
+      id: "s12", thema: "KI bei Hausaufgaben", typ: "taeuscht", merkmal: "widerspruch",
+      echt: { format: "post", absender: "schule.digital", datum: "vor 5 Std.", likes: "3.530", shares: "960",
+        text: "Krass, oder? 🤖 In einer Umfrage des Lehrerverbands Nordland unter 800 Lehrkräften sagen 6 von 10, dass sie schon mal eine Hausaufgabe bekommen haben, die vermutlich mit KI geschrieben war. Der Verband fordert jetzt klare Regeln." },
+      fake: { format: "artikel", absender: "Lupe Nachrichten", rubrik: "Bildung", datum: "Heute, 09:40",
+        titel: "Umfrage: Fast alle Hausaufgaben werden inzwischen von KI geschrieben",
+        text: "In einer Umfrage unter Lehrkräften sagen 6 von 10, dass sie schon mal eine Hausaufgabe bekommen haben, die vermutlich mit KI geschrieben war. Damit steht fest, dass fast alle Hausaufgaben inzwischen von KI stammen." },
+      aufloesung: "Aus „6 von 10 Lehrkräften haben es schon mal erlebt“ folgt nicht „fast alle Hausaufgaben“. Die Schlussfolgerung ist falsch, egal wie seriös die Seite aussieht."
+    },
+    {
+      id: "s13", thema: "Busfahrpreise", typ: "taeuscht", merkmal: "widerspruch",
+      echt: { format: "post", absender: "halden.unterwegs", datum: "vor 4 Std.", likes: "1.730", shares: "288",
+        text: "Ab 1. März wird's teurer 🚌 Das Einzelticket in Halden kostet dann 3,20 € statt 3,00 €. Das hat der Stadtrat gestern beschlossen. Das Monatsticket bleibt beim alten Preis." },
+      fake: { format: "artikel", absender: "Rundschau Kompakt", rubrik: "Region", datum: "Heute, 10:25",
+        titel: "Halden verdreifacht die Busfahrpreise",
+        text: "Ab dem 1. März kostet das Einzelticket in Halden 3,20 Euro statt bisher 3,00 Euro. Das hat der Stadtrat beschlossen. Für viele Familien wird Busfahren damit unbezahlbar." },
+      aufloesung: "Von 3,00 € auf 3,20 € sind knapp 7 Prozent, keine Verdreifachung. Die Überschrift widerspricht dem eigenen Text."
+    },
+    {
+      id: "s14", thema: "Rapper sagt Tour ab", typ: "taeuscht", merkmal: "vage",
+      echt: { format: "post", absender: "musik.news.de", datum: "vor 2 Std.", likes: "9.410", shares: "1.870",
+        text: "Uff 😮 Rapper Leno K. sagt seine Tour wegen einer Stimmband-OP ab. Das hat er selbst auf seinem offiziellen Account bekannt gegeben. Die Konzerte werden im Herbst nachgeholt, Tickets bleiben gültig." },
+      fake: { format: "artikel", absender: "Tagesbote", rubrik: "Kultur", datum: "Heute, 13:15",
+        titel: "Rapper Leno K. beendet seine Karriere",
+        text: "Rapper Leno K. hat seine Tour abgesagt. Nach Informationen aus seinem Umfeld will der Musiker nie wieder auftreten. Er selbst hat sich dazu bisher nicht geäußert." },
+      aufloesung: "„Aus seinem Umfeld“ ist eine anonyme Quelle, und der Betroffene selbst hat nichts gesagt. Der Post beruft sich auf die eigene Mitteilung des Rappers."
+    },
+    {
+      id: "s15", thema: "Mietpreise", typ: "taeuscht", merkmal: "widerspruch",
+      echt: { format: "post", absender: "wohnen.kompakt", datum: "vor 6 Std.", likes: "2.087", shares: "655",
+        text: "Mieten steigen weiter 🏠 Laut dem neuen Mietspiegel der Stadt Halden sind die Kaltmieten im letzten Jahr im Schnitt um 4 % gestiegen, auf 9,80 € pro Quadratmeter." },
+      fake: { format: "artikel", absender: "Lupe Nachrichten", rubrik: "Wohnen", datum: "Heute, 07:30",
+        titel: "Mieten in Halden steigen um 40 Prozent",
+        text: "Laut dem neuen Mietspiegel sind die Kaltmieten in Halden im vergangenen Jahr im Schnitt von 9,40 Euro auf 9,80 Euro pro Quadratmeter gestiegen. Das ist ein Plus von rund 40 Prozent." },
+      aufloesung: "Von 9,40 € auf 9,80 € sind gut 4 Prozent, nicht 40. Der Rechenfehler steckt im Artikel selbst."
     }
   ]
 };
