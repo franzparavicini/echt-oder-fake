@@ -25,157 +25,158 @@ window.UMFRAGE_CONFIG = {
     taeuscht: "Aufmachung täuscht"    // echt = lockerer Post, Fake = seriös wirkender Artikel
   },
 
-  // Woran man den Fake erkennen kann (ohne Vorwissen)
-  // Jeder Fake hat einen Fehler, den man direkt im Text sieht, ohne etwas zu wissen oder nachzuprüfen.
+  // Woran man den Fake erkennen kann. Jeder Fake ist sachlich geschrieben und hat genau einen
+  // Fehler, den man direkt im Text sieht – ohne Vorwissen und ohne etwas nachzuprüfen.
+  // Echte Meldungen enthalten bewusst auch mal Emojis, Ausrufezeichen oder „teilen“,
+  // damit der Stil allein kein Hinweis ist.
   merkmale: {
-    stil: "Reißerischer Stil",
-    manipulation: "Druck und Panikmache",
-    zuschoen: "Unmögliches Versprechen",
+    rechnung: "Rechen- oder Denkfehler",
+    ueberschrift: "Überschrift passt nicht zum Text",
     widerspruch: "Widerspruch im Text",
-    rechnung: "Rechen- oder Denkfehler"
+    manipulation: "Versteckte Manipulation"
   },
 
   // Erfundene Medien: Tagesbote, Rundschau Kompakt, Lupe Nachrichten, Nordblick Online.
   // Jedes taucht gleich oft bei echten und bei falschen Meldungen auf.
   szenarien: [
-    // ---------- Aufmachung hilft ----------
+    // ---------- Aufmachung hilft: echt = Artikel, Fake = Post ----------
     {
-      id: "s1", thema: "Handyverbot an Schulen", typ: "quelle", merkmal: "stil",
+      id: "s1", thema: "Handyverbot an Schulen", typ: "quelle", merkmal: "rechnung",
       echt: { format: "artikel", absender: "Lupe Nachrichten", rubrik: "Bildung", datum: "Heute, 07:45",
-        titel: "Gymnasium in Bergstedt testet handyfreie Pausen",
-        text: "Am Lessing-Gymnasium in Bergstedt bleiben Smartphones ab Montag in den Pausen in der Tasche. Der Versuch läuft zunächst bis zu den Sommerferien, sagte Schulleiterin Anja Krämer. Danach entscheiden Schülervertretung und Eltern gemeinsam, ob die Regel bleibt." },
-      fake: { format: "post", absender: "schulnews.krass", datum: "vor 2 Std.", likes: "6.412", shares: "2.390",
-        text: "ALLE Schulen verbieten ab Montag Handys!!! 📵😡 Wer erwischt wird, fliegt sofort von der Schule. Teilt das, bevor es gelöscht wird!!" },
-      aufloesung: "Großbuchstaben, viele Ausrufezeichen, wütende Emojis und „Teilt das, bevor es gelöscht wird“. Dazu eine unrealistische Übertreibung: Dass alle Schulen gleichzeitig Handys verbieten und jeder sofort von der Schule fliegt, ist nicht glaubwürdig."
+        titel: "Bergstedter Gymnasium behält handyfreie Pausen bei",
+        text: "Seit einem halben Jahr bleiben die Smartphones am Lessing-Gymnasium in den Pausen in der Tasche. In einer Umfrage der Schülervertretung fanden 41 Prozent die Regel gut, 38 Prozent lehnten sie ab, der Rest war unentschieden. Die Schulkonferenz hat beschlossen, das Verbot vorerst beizubehalten." },
+      fake: { format: "post", absender: "schul.news.nord", datum: "vor 2 Std.", likes: "2.412", shares: "390",
+        text: "Handyverbot am Lessing-Gymnasium bleibt 📵 In einer Umfrage der Schülervertretung waren 41 % dafür und 38 % dagegen. Damit ist eine klare Mehrheit der Schülerinnen und Schüler für das Verbot." },
+      aufloesung: "41 Prozent sind keine Mehrheit, schon gar keine klare. Mehr als die Hälfte war nicht dafür."
     },
     {
       id: "s2", thema: "Energydrinks", typ: "quelle", merkmal: "manipulation",
       echt: { format: "artikel", absender: "Tagesbote", rubrik: "Gesundheit", datum: "Heute, 10:12",
         titel: "Umfrage: Fast jeder fünfte Jugendliche trinkt regelmäßig Energydrinks",
-        text: "In einer Befragung des Instituts für Jugendgesundheit Halden gaben 18 Prozent der 1.200 befragten 14- bis 17-Jährigen an, mehrmals pro Woche Energydrinks zu trinken. Die Forschenden empfehlen, den Verkauf an Minderjährige stärker zu kontrollieren." },
-      fake: { format: "post", absender: "gesund.leben.wahrheit", datum: "vor 4 Std.", likes: "5.877", shares: "3.104",
-        text: "Ärzte schlagen Alarm 🚨 Schon EIN Energydrink kann dein Herz für immer schädigen! Die Getränkeindustrie will nicht, dass du das weißt. Teilen!" },
-      aufloesung: "Panikmache („für immer schädigen“), ein Feindbild („die Industrie will nicht, dass du das weißt“) und der Aufruf zum Teilen. So arbeiten Falschmeldungen, um Angst zu machen und sich schnell zu verbreiten."
+        text: "In einer Befragung des Instituts für Jugendgesundheit Halden gaben 19 Prozent der 1.200 befragten 14- bis 17-Jährigen an, mehrmals pro Woche Energydrinks zu trinken. Das Institut empfiehlt, den Verkauf an unter 16-Jährige zu beschränken." },
+      fake: { format: "post", absender: "eltern.wissen.mehr", datum: "vor 4 Std.", likes: "2.877", shares: "1.104",
+        text: "Neue Umfrage aus Halden: 19 % der Jugendlichen trinken mehrmals pro Woche Energydrinks. Die Hersteller versuchen gerade, die Studie verbieten zu lassen. Schickt das an alle Eltern in eurer Klassengruppe, solange es noch geht." },
+      aufloesung: "Die Zahl stimmt, aber der Rest ist Manipulation: Eine Studie kann man nicht „verbieten lassen“, und „solange es noch geht“ soll Druck machen, damit man ungeprüft weiterleitet."
     },
     {
-      id: "s3", thema: "Bahn-Gewinnspiel", typ: "quelle", merkmal: "zuschoen",
+      id: "s3", thema: "Bahn-Verlosung", typ: "quelle", merkmal: "manipulation",
       echt: { format: "artikel", absender: "Rundschau Kompakt", rubrik: "Verkehr", datum: "Heute, 09:03",
-        titel: "Regionalbahn zwischen Halden und Bergstedt fährt bald stündlich",
-        text: "Ab dem Fahrplanwechsel im Dezember fährt die Regionalbahn zwischen Halden und Bergstedt im Stundentakt statt alle zwei Stunden. Das teilte der Verkehrsverbund Nordland mit. Die Fahrzeit bleibt bei rund 40 Minuten." },
-      fake: { format: "post", absender: "bahn.deals.gratis", datum: "vor 1 Std.", likes: "7.020", shares: "4.488",
-        text: "🎁 Zum Fahrplanwechsel verschenkt die Bahn 10.000 Jahrestickets! Einfach diesen Beitrag teilen und deine Kontodaten per DM schicken. Nur noch heute! ⏰" },
-      aufloesung: "Geschenke, Zeitdruck („nur noch heute“) und die Bitte um Kontodaten sind klassische Merkmale von Betrug. Kein Unternehmen fragt Kontodaten über Direktnachrichten ab."
+        titel: "Regionalbahn Halden–Bergstedt fährt ab Dezember stündlich",
+        text: "Ab dem Fahrplanwechsel im Dezember fährt die Regionalbahn zwischen Halden und Bergstedt jede Stunde statt alle zwei Stunden. Der Verkehrsverbund Nordland setzt dafür zwei zusätzliche Züge ein. Die Ticketpreise bleiben gleich." },
+      fake: { format: "post", absender: "verkehrsverbund.nordland", datum: "vor 1 Std.", likes: "3.020", shares: "1.488",
+        text: "Zum Fahrplanwechsel verlosen wir 500 Jahreskarten für die Strecke Halden–Bergstedt 🎉 Zur Teilnahme teile diesen Beitrag und schick uns per Direktnachricht deinen Namen und deine IBAN, damit wir 1 € Bearbeitungsgebühr abbuchen können." },
+      aufloesung: "Der Account klingt offiziell, aber bei einer Verlosung muss man nie Bankdaten per Direktnachricht schicken oder eine Gebühr zahlen. Das ist ein typischer Betrugsversuch."
     },
     {
-      id: "s4", thema: "Wolf gesichtet", typ: "quelle", merkmal: "stil",
+      id: "s4", thema: "Wolf gesichtet", typ: "quelle", merkmal: "widerspruch",
       echt: { format: "artikel", absender: "Nordblick Online", rubrik: "Region", datum: "Heute, 11:30",
-        titel: "Wolf bei Wallhausen gesichtet",
-        text: "Ein Spaziergänger hat am Sonntag am Waldrand bei Wallhausen einen Wolf fotografiert. Das Landesamt für Umwelt hat das Foto geprüft und bestätigt. Eine Gefahr für Menschen bestehe nach bisherigen Erkenntnissen nicht, sagte ein Sprecher. Hunde sollten im Wald an der Leine bleiben." },
-      fake: { format: "post", absender: "heimat.alarm", datum: "vor 3 Std.", likes: "6.115", shares: "3.877",
-        text: "WOLFSRUDEL greift Kinder in Wallhausen an!!! 🐺😱 Lasst eure Kinder NICHT mehr raus, die Behörden tun mal wieder NICHTS!!" },
-      aufloesung: "Großbuchstaben, viele Ausrufezeichen und Panik („Lasst eure Kinder NICHT mehr raus“). Ein „Wolfsrudel greift Kinder an“ wäre eine riesige Nachricht, hier wird sie nur in einem wütenden Post behauptet."
+        titel: "Wolf bei Wallhausen fotografiert",
+        text: "Ein Spaziergänger hat am Sonntag am Waldrand bei Wallhausen einen Wolf fotografiert. Das Landesamt für Umwelt hat das Foto geprüft und geht von einem einzelnen jungen Tier auf der Durchreise aus. Hunde sollten im Wald vorerst an der Leine bleiben." },
+      fake: { format: "post", absender: "wallhausen.heute", datum: "vor 3 Std.", likes: "2.115", shares: "877",
+        text: "Wolf bei Wallhausen gesichtet 🐺 Das Landesamt hat bestätigt, dass es ein einzelnes Tier auf der Durchreise ist. Das Rudel hat sich inzwischen fest im Wald angesiedelt, Kinder sollten dort nicht mehr allein spielen." },
+      aufloesung: "Erst ist es ein einzelnes Tier auf der Durchreise, im nächsten Satz ein Rudel, das sich fest angesiedelt hat. Beides kann nicht stimmen."
     },
     {
-      id: "s5", thema: "Butterpreis", typ: "quelle", merkmal: "manipulation",
+      id: "s5", thema: "Butterpreis", typ: "quelle", merkmal: "rechnung",
       echt: { format: "artikel", absender: "Tagesbote", rubrik: "Verbraucher", datum: "Heute, 08:20",
         titel: "Butter wird etwas günstiger",
-        text: "Ein Päckchen Butter kostet in vielen Supermärkten seit dieser Woche 20 Cent weniger als im Vormonat. Grund seien gesunkene Großhandelspreise für Milch, teilte der Handelsverband Nordland mit." },
-      fake: { format: "post", absender: "spar.fuchs.24", datum: "vor 5 Std.", likes: "4.903", shares: "2.230",
-        text: "Butter bald für 10 Euro?! 🧈💸 Ab nächster Woche wird alles viel teurer, sagen Insider. Deckt euch JETZT ein, bevor es zu spät ist!" },
-      aufloesung: "Eine Schockzahl (10 € für Butter) und Zeitdruck („Deckt euch JETZT ein, bevor es zu spät ist“). Solche Aufrufe sollen Panik auslösen, statt zu informieren."
+        text: "Ein Päckchen Markenbutter kostet in vielen Supermärkten seit Montag 2,19 Euro statt 2,39 Euro. Grund seien gesunkene Großhandelspreise für Milch, teilte der Handelsverband Nordland mit. Ob die Preise weiter sinken, sei noch offen." },
+      fake: { format: "post", absender: "preis.radar", datum: "vor 5 Std.", likes: "1.903", shares: "430",
+        text: "Butter wird billiger 🧈 Statt 2,39 € kostet das Päckchen jetzt nur noch 2,19 €. Das ist fast die Hälfte weniger. Es lohnt sich also, mehrere Päckchen zu kaufen und einzufrieren." },
+      aufloesung: "20 Cent weniger sind keine „fast die Hälfte“. Die Hälfte von 2,39 € wären rund 1,20 €."
     },
 
     // ---------- Gleiche Aufmachung ----------
     {
       id: "s6", thema: "Freibad", typ: "inhalt", merkmal: "widerspruch",
       echt: { format: "post", absender: "stadt.halden.info", datum: "vor 2 Std.", likes: "1.284", shares: "211",
-        text: "Das Freibad Halden öffnet in diesem Jahr erst am 15. Mai, zwei Wochen später als sonst ☀️ Normalerweise beginnt die Saison Anfang Mai. Grund sind Reparaturen am Becken. Der Eintritt bleibt bei 4 Euro." },
-      fake: { format: "post", absender: "halden.aktuell", datum: "vor 2 Std.", likes: "1.502", shares: "348",
-        text: "Das Freibad Halden öffnet in diesem Jahr schon am 15. Mai, zwei Wochen früher als sonst ☀️ Normalerweise beginnt die Saison Anfang Mai. Der Eintritt steigt dafür von 4 auf 25 Euro." },
-      aufloesung: "Der Fake widerspricht sich selbst: Wenn die Saison sonst Anfang Mai beginnt, ist der 15. Mai später, nicht früher. Dazu kommt ein unrealistischer Preissprung von 4 auf 25 Euro."
+        text: "Das Freibad Halden öffnet dieses Jahr erst am 15. Mai, zwei Wochen später als sonst ☀️ Normalerweise beginnt die Saison Anfang Mai. Grund sind Reparaturen am Becken. Der Eintritt steigt leicht von 4 auf 4,50 €." },
+      fake: { format: "post", absender: "halden.aktuell", datum: "vor 2 Std.", likes: "1.402", shares: "248",
+        text: "Das Freibad Halden öffnet dieses Jahr schon am 15. Mai, zwei Wochen früher als sonst ☀️ Normalerweise beginnt die Saison Anfang Mai. Grund ist das gute Wetter. Der Eintritt steigt leicht von 4 auf 4,50 €." },
+      aufloesung: "Wenn die Saison sonst Anfang Mai beginnt, ist der 15. Mai später, nicht früher. Der Fake widerspricht sich in zwei Sätzen."
     },
     {
-      id: "s7", thema: "Handy und Schlaf", typ: "inhalt", merkmal: "widerspruch",
+      id: "s7", thema: "Handy und Schlaf", typ: "inhalt", merkmal: "ueberschrift",
       echt: { format: "artikel", absender: "Lupe Nachrichten", rubrik: "Wissen", datum: "Heute, 06:50",
         titel: "Studie: Wer abends lange am Handy ist, schläft etwas kürzer",
         text: "Forschende der Universität Halden haben 2.000 Erwachsene zu ihren Schlafgewohnheiten befragt. Wer abends mehr als zwei Stunden am Smartphone war, schlief im Schnitt 20 Minuten kürzer. Ob das Handy die Ursache ist, lasse sich aus der Befragung nicht ableiten, sagt Studienleiterin Sarah Yilmaz." },
       fake: { format: "artikel", absender: "Tagesbote", rubrik: "Wissen", datum: "Heute, 06:50",
-        titel: "Studie beweist: Handy am Abend halbiert den Schlaf",
-        text: "Forschende haben 2.000 Erwachsene zu ihren Schlafgewohnheiten befragt. Wer abends mehr als zwei Stunden am Smartphone war, schlief im Schnitt 20 Minuten kürzer. Damit ist bewiesen, dass das Handy den Schlaf halbiert." },
-      aufloesung: "Die Überschrift passt nicht zum Text: 20 Minuten weniger sind keine Halbierung. Außerdem „beweist“ eine Befragung keine Ursache. Die echte Meldung sagt genau das."
+        titel: "Studie zeigt: Das Handy am Abend ist schuld an Schlafmangel",
+        text: "Forschende der Universität Halden haben 2.000 Erwachsene zu ihren Schlafgewohnheiten befragt. Wer abends mehr als zwei Stunden am Smartphone war, schlief im Schnitt 20 Minuten kürzer. Ob das Handy die Ursache ist, lasse sich aus der Befragung allerdings nicht ableiten, sagt Studienleiterin Sarah Yilmaz." },
+      aufloesung: "Der Text sagt ausdrücklich, dass man nicht weiß, ob das Handy die Ursache ist. Die Überschrift behauptet genau das Gegenteil."
     },
     {
-      id: "s8", thema: "Rückruf Speiseeis", typ: "inhalt", merkmal: "manipulation",
+      id: "s8", thema: "Rückruf Speiseeis", typ: "inhalt", merkmal: "widerspruch",
       echt: { format: "post", absender: "verbraucher.check", datum: "vor 6 Std.", likes: "2.735", shares: "1.906",
-        text: "Rückruf ⚠️ Eiswerk Nord ruft sein Vanilleeis in der 500-ml-Packung mit Haltbarkeitsdatum 12.08. zurück. Es könnten Plastikteile enthalten sein. Betroffen sind nur Märkte in Nordland. Das Geld gibt es im Laden zurück." },
-      fake: { format: "post", absender: "verbraucher.warnung", datum: "vor 6 Std.", likes: "3.118", shares: "2.640",
-        text: "Rückruf ⚠️ Alle Eissorten in deutschen Supermärkten sind betroffen! Es könnten Plastikteile enthalten sein. Welche Hersteller, wird noch nicht gesagt. Werft sicherheitshalber alles weg und teilt das!" },
-      aufloesung: "„Alle Eissorten in allen Supermärkten“ ist unrealistisch, und ein Rückruf ohne Hersteller oder Produkt hilft niemandem. Dazu die Aufforderung, alles wegzuwerfen und zu teilen."
+        text: "Rückruf ⚠️ Eiswerk Nord ruft sein Vanilleeis (500 ml, haltbar bis 12.08.) zurück, weil Plastikteile enthalten sein könnten. Betroffen sind nur Märkte in Nordland. Bitte nicht essen und gern teilen, damit es alle mitbekommen!" },
+      fake: { format: "post", absender: "verbraucher.warnung", datum: "vor 6 Std.", likes: "2.918", shares: "2.040",
+        text: "Rückruf ⚠️ Eiswerk Nord ruft sein Vanilleeis (500 ml, haltbar bis 12.08.) zurück, weil Plastikteile enthalten sein könnten. Betroffen sind damit alle Eissorten des Herstellers, nur das Schokoeis ist sicher. Bitte nicht essen und weitersagen!" },
+      aufloesung: "Zurückgerufen wird nur das Vanilleeis. Daraus folgt nicht, dass „alle Sorten“ betroffen sind, und „alle außer Schoko“ widerspricht sich selbst. Das „gern teilen“ in der echten Meldung ist dagegen bei einer Warnung normal."
     },
     {
-      id: "s9", thema: "Lkw-Unfall", typ: "inhalt", merkmal: "widerspruch",
+      id: "s9", thema: "Lkw-Unfall", typ: "inhalt", merkmal: "ueberschrift",
       echt: { format: "artikel", absender: "Rundschau Kompakt", rubrik: "Region", datum: "Heute, 12:05",
         titel: "B27: Umgekippter Lkw sorgt für langen Stau",
-        text: "Auf der B27 zwischen Halden und Bergstedt ist am Morgen ein Lkw umgekippt. Der Fahrer wurde leicht verletzt, sagte ein Polizeisprecher. Die Straße war bis 11 Uhr in beide Richtungen gesperrt." },
+        text: "Auf der B27 zwischen Halden und Bergstedt ist am Morgen ein Lkw umgekippt. Der Fahrer wurde leicht verletzt, sagte ein Polizeisprecher. Wegen auslaufenden Diesels war die Straße bis 11 Uhr in beide Richtungen gesperrt." },
       fake: { format: "artikel", absender: "Nordblick Online", rubrik: "Region", datum: "Heute, 12:05",
-        titel: "B27: Polizei verschweigt Zahl der Opfer nach Lkw-Unfall",
-        text: "Auf der B27 zwischen Halden und Bergstedt ist am Morgen ein Lkw umgekippt. Außer dem Fahrer war niemand beteiligt, er blieb unverletzt. Trotzdem will die Polizei die Zahl der Opfer offenbar nicht nennen." },
-      aufloesung: "Der Fake widerspricht sich selbst: Wenn nur der Fahrer beteiligt war und er unverletzt blieb, gibt es keine Opfer, die verschwiegen werden könnten. Die Überschrift soll trotzdem Misstrauen wecken."
+        titel: "B27: Lkw-Unfall mit mehreren Verletzten",
+        text: "Auf der B27 zwischen Halden und Bergstedt ist am Morgen ein Lkw umgekippt. Außer dem Lkw war kein Fahrzeug beteiligt, der Fahrer blieb unverletzt, sagte ein Polizeisprecher. Die Straße war bis 11 Uhr gesperrt." },
+      aufloesung: "Die Überschrift spricht von mehreren Verletzten, im Text gibt es keinen einzigen: Nur der Lkw war beteiligt, und der Fahrer blieb unverletzt."
     },
     {
-      id: "s10", thema: "Abnehm-Trick", typ: "inhalt", merkmal: "zuschoen",
+      id: "s10", thema: "Abnehmen mit Linsen", typ: "inhalt", merkmal: "rechnung",
       echt: { format: "post", absender: "gesundheit.kompakt", datum: "vor 3 Std.", likes: "2.204", shares: "517",
-        text: "Gut zu wissen 🥦 Ernährungsfachleute raten Erwachsenen zu etwa 30 Gramm Ballaststoffen am Tag. Die meisten erreichen das nicht, vor allem weil sie wenig Vollkorn, Gemüse und Hülsenfrüchte essen." },
-      fake: { format: "post", absender: "gesundheit.heute", datum: "vor 3 Std.", likes: "2.611", shares: "702",
-        text: "Gut zu wissen 🥦 Mit diesem einen Gemüse nimmst du in 7 Tagen 10 Kilo ab, ganz ohne Sport! Welches es ist, verraten wir im Link in der Bio 👇" },
-      aufloesung: "10 Kilo in einer Woche ohne Sport ist unrealistisch. Dass die Antwort nur über einen Link verraten wird, ist ein typischer Klick-Köder."
+        text: "Krasser Fakt 🤯 Die meisten Erwachsenen essen nur etwa halb so viele Ballaststoffe wie empfohlen. Fachleute raten zu rund 30 Gramm am Tag, zum Beispiel aus Vollkorn, Gemüse und Hülsenfrüchten wie Linsen." },
+      fake: { format: "post", absender: "gesundheit.heute", datum: "vor 3 Std.", likes: "2.511", shares: "602",
+        text: "Gut zu wissen 🥦 In einer Studie haben Teilnehmende, die täglich eine Schüssel Linsen aßen, im Schnitt 2 Kilo pro Woche abgenommen. Nach drei Monaten waren es so insgesamt rund 8 Kilo. Linsen sind also ein echter Geheimtipp." },
+      aufloesung: "Drei Monate sind etwa 13 Wochen. Bei 2 Kilo pro Woche wären das rund 26 Kilo, nicht 8. Die Zahlen passen nicht zusammen. Das „Krasser Fakt 🤯“ in der echten Meldung ist nur Stil."
     },
 
-    // ---------- Aufmachung täuscht ----------
+    // ---------- Aufmachung täuscht: echt = Post, Fake = Artikel ----------
     {
-      id: "s11", thema: "Stadtfest abgesagt", typ: "taeuscht", merkmal: "widerspruch",
+      id: "s11", thema: "Stadtfest abgesagt", typ: "taeuscht", merkmal: "ueberschrift",
       echt: { format: "post", absender: "bergstedt.erleben", datum: "vor 1 Std.", likes: "988", shares: "403",
-        text: "Schade 😕 Das Stadtfest am Samstag fällt aus, weil der Wetterdienst eine Unwetterwarnung herausgegeben hat. Die Stadt sucht einen Ersatztermin im September, alle Infos auf der Website der Stadt." },
+        text: "Bitter!! 😩 Das Stadtfest am Samstag fällt aus. Der Wetterdienst hat eine Unwetterwarnung rausgegeben, die Stadt will das Fest im September nachholen." },
       fake: { format: "artikel", absender: "Rundschau Kompakt", rubrik: "Region", datum: "Heute, 14:10",
         titel: "Stadtfest Bergstedt abgesagt, weil die Stadt pleite ist",
         text: "Das Stadtfest am Samstag findet nicht statt. Als Grund nennt die Stadt eine Unwetterwarnung für das Wochenende. Das Fest soll im September nachgeholt werden." },
-      aufloesung: "Die Überschrift behauptet etwas, das im Text gar nicht steht: Dort ist die Unwetterwarnung der Grund, und das Fest wird nachgeholt. Von Geldnot ist keine Rede."
+      aufloesung: "Die Überschrift behauptet Geldnot, im Text ist der Grund eine Unwetterwarnung, und das Fest wird nachgeholt. Die Ausrufezeichen in der echten Meldung sind nur Stil."
     },
     {
       id: "s12", thema: "KI bei Hausaufgaben", typ: "taeuscht", merkmal: "rechnung",
       echt: { format: "post", absender: "schule.digital", datum: "vor 5 Std.", likes: "3.530", shares: "960",
         text: "Krass, oder? 🤖 In einer Umfrage des Lehrerverbands Nordland unter 800 Lehrkräften sagen 6 von 10, dass sie schon mal eine Hausaufgabe bekommen haben, die vermutlich mit KI geschrieben war. Der Verband fordert jetzt klare Regeln." },
       fake: { format: "artikel", absender: "Lupe Nachrichten", rubrik: "Bildung", datum: "Heute, 09:40",
-        titel: "Umfrage: Fast alle Hausaufgaben werden inzwischen von KI geschrieben",
-        text: "In einer Umfrage unter Lehrkräften sagen 6 von 10, dass sie schon mal eine Hausaufgabe bekommen haben, die vermutlich mit KI geschrieben war. Damit steht fest, dass fast alle Hausaufgaben inzwischen von KI stammen." },
-      aufloesung: "Aus „6 von 10 Lehrkräften haben es schon mal erlebt“ folgt nicht „fast alle Hausaufgaben“. Die Schlussfolgerung ist falsch, egal wie seriös die Seite aussieht."
+        titel: "Umfrage: Die meisten Hausaufgaben werden inzwischen mit KI geschrieben",
+        text: "In einer Umfrage des Lehrerverbands Nordland unter 800 Lehrkräften sagen 6 von 10, dass sie schon mal eine Hausaufgabe bekommen haben, die vermutlich mit KI geschrieben war. Der Verband fordert klare Regeln." },
+      aufloesung: "„6 von 10 Lehrkräften haben es schon mal erlebt“ heißt nicht, dass die meisten Hausaufgaben mit KI geschrieben werden. Schon eine einzige Hausaufgabe reicht für ein „schon mal“."
     },
     {
       id: "s13", thema: "Busfahrpreise", typ: "taeuscht", merkmal: "rechnung",
       echt: { format: "post", absender: "halden.unterwegs", datum: "vor 4 Std.", likes: "1.730", shares: "288",
-        text: "Ab 1. März wird's teurer 🚌 Das Einzelticket in Halden kostet dann 3,20 € statt 3,00 €. Das hat der Stadtrat gestern beschlossen. Das Monatsticket bleibt beim alten Preis." },
+        text: "Ab 1. März wird's teurer!! 🚌💸 Das Einzelticket in Halden kostet dann 3,20 € statt 3,00 €. Das Monatsticket bleibt beim alten Preis." },
       fake: { format: "artikel", absender: "Rundschau Kompakt", rubrik: "Region", datum: "Heute, 10:25",
-        titel: "Halden verdreifacht die Busfahrpreise",
-        text: "Ab dem 1. März kostet das Einzelticket in Halden 3,20 Euro statt bisher 3,00 Euro. Das hat der Stadtrat beschlossen. Für viele Familien wird Busfahren damit unbezahlbar." },
-      aufloesung: "Von 3,00 € auf 3,20 € sind knapp 7 Prozent, keine Verdreifachung. Die Überschrift widerspricht dem eigenen Text."
+        titel: "Busfahren in Halden wird um ein Drittel teurer",
+        text: "Ab dem 1. März kostet das Einzelticket in Halden 3,20 Euro statt bisher 3,00 Euro. Das hat der Stadtrat beschlossen. Das Monatsticket bleibt beim alten Preis." },
+      aufloesung: "Von 3,00 € auf 3,20 € sind knapp 7 Prozent. Ein Drittel wäre 1 € mehr. Die Überschrift rechnet falsch."
     },
     {
-      id: "s14", thema: "Rapper sagt Tour ab", typ: "taeuscht", merkmal: "widerspruch",
+      id: "s14", thema: "Rapper sagt Tour ab", typ: "taeuscht", merkmal: "ueberschrift",
       echt: { format: "post", absender: "musik.news.de", datum: "vor 2 Std.", likes: "9.410", shares: "1.870",
-        text: "Uff 😮 Rapper Leno K. sagt seine Tour wegen einer Stimmband-OP ab. Die Konzerte werden im Herbst nachgeholt, die Tickets bleiben gültig. Gute Besserung!" },
+        text: "Oh nein 😭 Leno K. muss seine Tour wegen einer Stimmband-OP absagen. Die gute Nachricht: Alle Konzerte werden im Herbst nachgeholt, eure Tickets bleiben gültig!" },
       fake: { format: "artikel", absender: "Tagesbote", rubrik: "Kultur", datum: "Heute, 13:15",
-        titel: "Rapper Leno K. beendet seine Karriere",
-        text: "Rapper Leno K. hat seine Tour wegen einer Stimmband-OP abgesagt. Die Konzerte sollen im Herbst nachgeholt werden. Damit steht fest, dass der Musiker nie wieder auftreten wird." },
-      aufloesung: "Der Fake widerspricht sich selbst: Wenn die Konzerte im Herbst nachgeholt werden, tritt er wieder auf. Die Überschrift „beendet Karriere“ passt nicht zum Text."
+        titel: "Rapper Leno K. sagt alle Konzerte ersatzlos ab",
+        text: "Rapper Leno K. hat seine Tour wegen einer Stimmband-OP abgesagt. Die Konzerte sollen im Herbst nachgeholt werden, gekaufte Tickets bleiben gültig." },
+      aufloesung: "„Ersatzlos“ heißt: ohne Ersatz. Im Text steht aber, dass die Konzerte nachgeholt werden. Überschrift und Text widersprechen sich."
     },
     {
       id: "s15", thema: "Mietpreise", typ: "taeuscht", merkmal: "rechnung",
       echt: { format: "post", absender: "wohnen.kompakt", datum: "vor 6 Std.", likes: "2.087", shares: "655",
-        text: "Mieten steigen weiter 🏠 Laut dem neuen Mietspiegel der Stadt Halden sind die Kaltmieten im letzten Jahr im Schnitt um 4 % gestiegen, auf 9,80 € pro Quadratmeter." },
+        text: "Wohnen wird wieder teurer 🏠😬 Laut neuem Mietspiegel sind die Kaltmieten in Halden im letzten Jahr von 9,40 € auf 9,80 € pro Quadratmeter gestiegen, also um gut 4 %." },
       fake: { format: "artikel", absender: "Lupe Nachrichten", rubrik: "Wohnen", datum: "Heute, 07:30",
-        titel: "Mieten in Halden steigen um 40 Prozent",
-        text: "Laut dem neuen Mietspiegel sind die Kaltmieten in Halden im vergangenen Jahr im Schnitt von 9,40 Euro auf 9,80 Euro pro Quadratmeter gestiegen. Das ist ein Plus von rund 40 Prozent." },
-      aufloesung: "Von 9,40 € auf 9,80 € sind gut 4 Prozent, nicht 40. Der Rechenfehler steckt im Artikel selbst."
+        titel: "Mieten in Halden steigen um mehr als zehn Prozent",
+        text: "Laut dem neuen Mietspiegel sind die Kaltmieten in Halden im vergangenen Jahr im Schnitt von 9,40 Euro auf 9,80 Euro pro Quadratmeter gestiegen." },
+      aufloesung: "40 Cent mehr bei 9,40 € sind gut 4 Prozent. Zehn Prozent wären etwa 94 Cent mehr."
     }
   ]
 };
