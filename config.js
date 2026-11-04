@@ -26,12 +26,13 @@ window.UMFRAGE_CONFIG = {
   },
 
   // Woran man den Fake erkennen kann (ohne Vorwissen)
+  // Jeder Fake hat einen Fehler, den man direkt im Text sieht, ohne etwas zu wissen oder nachzuprüfen.
   merkmale: {
     stil: "Reißerischer Stil",
-    angst: "Angstmache und Verschwörung",
-    zuschoen: "Zu schön, um wahr zu sein",
-    vage: "Vage Quelle, fehlende Details",
-    widerspruch: "Widerspruch im Text"
+    manipulation: "Druck und Panikmache",
+    zuschoen: "Unmögliches Versprechen",
+    widerspruch: "Widerspruch im Text",
+    rechnung: "Rechen- oder Denkfehler"
   },
 
   // Erfundene Medien: Tagesbote, Rundschau Kompakt, Lupe Nachrichten, Nordblick Online.
@@ -45,16 +46,16 @@ window.UMFRAGE_CONFIG = {
         text: "Am Lessing-Gymnasium in Bergstedt bleiben Smartphones ab Montag in den Pausen in der Tasche. Der Versuch läuft zunächst bis zu den Sommerferien, sagte Schulleiterin Anja Krämer. Danach entscheiden Schülervertretung und Eltern gemeinsam, ob die Regel bleibt." },
       fake: { format: "post", absender: "schulnews.krass", datum: "vor 2 Std.", likes: "6.412", shares: "2.390",
         text: "ALLE Schulen verbieten ab Montag Handys!!! 📵😡 Wer erwischt wird, fliegt sofort von der Schule. Teilt das, bevor es gelöscht wird!!" },
-      aufloesung: "Großbuchstaben, viele Ausrufezeichen, Emojis und „Teilt das, bevor es gelöscht wird“ sind typische Merkmale von Falschmeldungen. Die seriöse Meldung nennt eine konkrete Schule und eine Ansprechpartnerin."
+      aufloesung: "Großbuchstaben, viele Ausrufezeichen, wütende Emojis und „Teilt das, bevor es gelöscht wird“. Dazu eine unrealistische Übertreibung: Dass alle Schulen gleichzeitig Handys verbieten und jeder sofort von der Schule fliegt, ist nicht glaubwürdig."
     },
     {
-      id: "s2", thema: "Energydrinks", typ: "quelle", merkmal: "angst",
+      id: "s2", thema: "Energydrinks", typ: "quelle", merkmal: "manipulation",
       echt: { format: "artikel", absender: "Tagesbote", rubrik: "Gesundheit", datum: "Heute, 10:12",
         titel: "Umfrage: Fast jeder fünfte Jugendliche trinkt regelmäßig Energydrinks",
         text: "In einer Befragung des Instituts für Jugendgesundheit Halden gaben 18 Prozent der 1.200 befragten 14- bis 17-Jährigen an, mehrmals pro Woche Energydrinks zu trinken. Die Forschenden empfehlen, den Verkauf an Minderjährige stärker zu kontrollieren." },
       fake: { format: "post", absender: "gesund.leben.wahrheit", datum: "vor 4 Std.", likes: "5.877", shares: "3.104",
         text: "Ärzte schlagen Alarm 🚨 Schon EIN Energydrink kann dein Herz für immer schädigen! Die Getränkeindustrie will nicht, dass du das weißt. Teilen!" },
-      aufloesung: "„Ärzte“ ohne Namen, Angst („für immer schädigen“) und „die Industrie will nicht, dass du das weißt“ sind Warnsignale. Die seriöse Meldung nennt Institut, Zahl der Befragten und das genaue Ergebnis."
+      aufloesung: "Panikmache („für immer schädigen“), ein Feindbild („die Industrie will nicht, dass du das weißt“) und der Aufruf zum Teilen. So arbeiten Falschmeldungen, um Angst zu machen und sich schnell zu verbreiten."
     },
     {
       id: "s3", thema: "Bahn-Gewinnspiel", typ: "quelle", merkmal: "zuschoen",
@@ -72,26 +73,26 @@ window.UMFRAGE_CONFIG = {
         text: "Ein Spaziergänger hat am Sonntag am Waldrand bei Wallhausen einen Wolf fotografiert. Das Landesamt für Umwelt hat das Foto geprüft und bestätigt. Eine Gefahr für Menschen bestehe nach bisherigen Erkenntnissen nicht, sagte ein Sprecher. Hunde sollten im Wald an der Leine bleiben." },
       fake: { format: "post", absender: "heimat.alarm", datum: "vor 3 Std.", likes: "6.115", shares: "3.877",
         text: "WOLFSRUDEL greift Kinder in Wallhausen an!!! 🐺😱 Lasst eure Kinder NICHT mehr raus, die Behörden tun mal wieder NICHTS!!" },
-      aufloesung: "Großbuchstaben, Ausrufezeichen und Panikmache ohne Quelle. Die seriöse Meldung sagt, wer das Foto geprüft hat, und gibt eine sachliche Einschätzung."
+      aufloesung: "Großbuchstaben, viele Ausrufezeichen und Panik („Lasst eure Kinder NICHT mehr raus“). Ein „Wolfsrudel greift Kinder an“ wäre eine riesige Nachricht, hier wird sie nur in einem wütenden Post behauptet."
     },
     {
-      id: "s5", thema: "Butterpreis", typ: "quelle", merkmal: "vage",
+      id: "s5", thema: "Butterpreis", typ: "quelle", merkmal: "manipulation",
       echt: { format: "artikel", absender: "Tagesbote", rubrik: "Verbraucher", datum: "Heute, 08:20",
         titel: "Butter wird etwas günstiger",
         text: "Ein Päckchen Butter kostet in vielen Supermärkten seit dieser Woche 20 Cent weniger als im Vormonat. Grund seien gesunkene Großhandelspreise für Milch, teilte der Handelsverband Nordland mit." },
       fake: { format: "post", absender: "spar.fuchs.24", datum: "vor 5 Std.", likes: "4.903", shares: "2.230",
         text: "Butter bald für 10 Euro?! 🧈💸 Ab nächster Woche wird alles viel teurer, sagen Insider. Deckt euch JETZT ein, bevor es zu spät ist!" },
-      aufloesung: "„Insider“ ist keine überprüfbare Quelle. Dazu kommen eine Schockzahl und Zeitdruck. Die seriöse Meldung nennt den genauen Betrag und wer ihn mitgeteilt hat."
+      aufloesung: "Eine Schockzahl (10 € für Butter) und Zeitdruck („Deckt euch JETZT ein, bevor es zu spät ist“). Solche Aufrufe sollen Panik auslösen, statt zu informieren."
     },
 
     // ---------- Gleiche Aufmachung ----------
     {
-      id: "s6", thema: "Freibad", typ: "inhalt", merkmal: "vage",
+      id: "s6", thema: "Freibad", typ: "inhalt", merkmal: "widerspruch",
       echt: { format: "post", absender: "stadt.halden.info", datum: "vor 2 Std.", likes: "1.284", shares: "211",
-        text: "Das Freibad Halden öffnet in diesem Jahr am 15. Mai, zwei Wochen später als sonst ☀️ Grund sind Reparaturen am Becken, teilen die Stadtwerke mit. Der Eintritt bleibt bei 4 Euro." },
+        text: "Das Freibad Halden öffnet in diesem Jahr erst am 15. Mai, zwei Wochen später als sonst ☀️ Normalerweise beginnt die Saison Anfang Mai. Grund sind Reparaturen am Becken. Der Eintritt bleibt bei 4 Euro." },
       fake: { format: "post", absender: "halden.aktuell", datum: "vor 2 Std.", likes: "1.502", shares: "348",
-        text: "Das Freibad Halden öffnet in diesem Jahr am 15. Mai ☀️ Wie ein Mitarbeiter verraten hat, steigt der Eintritt dann von 4 auf 25 Euro. Die Stadt will das wohl erst kurz vorher bekannt geben." },
-      aufloesung: "„Ein Mitarbeiter hat verraten“ und „wohl“ sind keine Belege, die Erhöhung auf das Sechsfache ist unrealistisch. Die echte Meldung nennt die Stadtwerke als Quelle."
+        text: "Das Freibad Halden öffnet in diesem Jahr schon am 15. Mai, zwei Wochen früher als sonst ☀️ Normalerweise beginnt die Saison Anfang Mai. Der Eintritt steigt dafür von 4 auf 25 Euro." },
+      aufloesung: "Der Fake widerspricht sich selbst: Wenn die Saison sonst Anfang Mai beginnt, ist der 15. Mai später, nicht früher. Dazu kommt ein unrealistischer Preissprung von 4 auf 25 Euro."
     },
     {
       id: "s7", thema: "Handy und Schlaf", typ: "inhalt", merkmal: "widerspruch",
@@ -104,22 +105,22 @@ window.UMFRAGE_CONFIG = {
       aufloesung: "Die Überschrift passt nicht zum Text: 20 Minuten weniger sind keine Halbierung. Außerdem „beweist“ eine Befragung keine Ursache. Die echte Meldung sagt genau das."
     },
     {
-      id: "s8", thema: "Rückruf Speiseeis", typ: "inhalt", merkmal: "vage",
+      id: "s8", thema: "Rückruf Speiseeis", typ: "inhalt", merkmal: "manipulation",
       echt: { format: "post", absender: "verbraucher.check", datum: "vor 6 Std.", likes: "2.735", shares: "1.906",
         text: "Rückruf ⚠️ Eiswerk Nord ruft sein Vanilleeis in der 500-ml-Packung mit Haltbarkeitsdatum 12.08. zurück. Es könnten Plastikteile enthalten sein. Betroffen sind nur Märkte in Nordland. Das Geld gibt es im Laden zurück." },
       fake: { format: "post", absender: "verbraucher.warnung", datum: "vor 6 Std.", likes: "3.118", shares: "2.640",
         text: "Rückruf ⚠️ Alle Eissorten in deutschen Supermärkten sind betroffen! Es könnten Plastikteile enthalten sein. Welche Hersteller, wird noch nicht gesagt. Werft sicherheitshalber alles weg und teilt das!" },
-      aufloesung: "Ein echter Rückruf nennt Hersteller, Produkt und Haltbarkeitsdatum. „Alle Sorten, Hersteller unbekannt“ ist unglaubwürdig, dazu der Aufruf zum Teilen."
+      aufloesung: "„Alle Eissorten in allen Supermärkten“ ist unrealistisch, und ein Rückruf ohne Hersteller oder Produkt hilft niemandem. Dazu die Aufforderung, alles wegzuwerfen und zu teilen."
     },
     {
-      id: "s9", thema: "Lkw-Unfall", typ: "inhalt", merkmal: "angst",
+      id: "s9", thema: "Lkw-Unfall", typ: "inhalt", merkmal: "widerspruch",
       echt: { format: "artikel", absender: "Rundschau Kompakt", rubrik: "Region", datum: "Heute, 12:05",
         titel: "B27: Umgekippter Lkw sorgt für langen Stau",
         text: "Auf der B27 zwischen Halden und Bergstedt ist am Morgen ein Lkw umgekippt. Der Fahrer wurde leicht verletzt, sagte ein Polizeisprecher. Die Straße war bis 11 Uhr in beide Richtungen gesperrt." },
       fake: { format: "artikel", absender: "Nordblick Online", rubrik: "Region", datum: "Heute, 12:05",
         titel: "B27: Polizei verschweigt Zahl der Opfer nach Lkw-Unfall",
-        text: "Auf der B27 zwischen Halden und Bergstedt ist am Morgen ein Lkw umgekippt. Augenzeugen berichten von vielen Verletzten, die Polizei schweigt dazu. Offenbar soll die Zahl der Opfer nicht bekannt werden." },
-      aufloesung: "Unbenannte „Augenzeugen“ statt Polizei, Vermutungen („offenbar“) und der Vorwurf des Verschweigens ohne Beleg. Die echte Meldung zitiert die Polizei."
+        text: "Auf der B27 zwischen Halden und Bergstedt ist am Morgen ein Lkw umgekippt. Außer dem Fahrer war niemand beteiligt, er blieb unverletzt. Trotzdem will die Polizei die Zahl der Opfer offenbar nicht nennen." },
+      aufloesung: "Der Fake widerspricht sich selbst: Wenn nur der Fahrer beteiligt war und er unverletzt blieb, gibt es keine Opfer, die verschwiegen werden könnten. Die Überschrift soll trotzdem Misstrauen wecken."
     },
     {
       id: "s10", thema: "Abnehm-Trick", typ: "inhalt", merkmal: "zuschoen",
@@ -132,16 +133,16 @@ window.UMFRAGE_CONFIG = {
 
     // ---------- Aufmachung täuscht ----------
     {
-      id: "s11", thema: "Stadtfest abgesagt", typ: "taeuscht", merkmal: "vage",
+      id: "s11", thema: "Stadtfest abgesagt", typ: "taeuscht", merkmal: "widerspruch",
       echt: { format: "post", absender: "bergstedt.erleben", datum: "vor 1 Std.", likes: "988", shares: "403",
         text: "Schade 😕 Das Stadtfest am Samstag fällt aus, weil der Wetterdienst eine Unwetterwarnung herausgegeben hat. Die Stadt sucht einen Ersatztermin im September, alle Infos auf der Website der Stadt." },
       fake: { format: "artikel", absender: "Rundschau Kompakt", rubrik: "Region", datum: "Heute, 14:10",
-        titel: "Stadtfest Bergstedt abgesagt: Stadt offenbar pleite",
-        text: "Das Stadtfest am Samstag findet nicht statt. Wie aus gut informierten Kreisen verlautet, ist die Stadt Bergstedt praktisch pleite und kann sich die Veranstaltung nicht mehr leisten. Eine offizielle Bestätigung gibt es bisher nicht." },
-      aufloesung: "„Gut informierte Kreise“ und „keine offizielle Bestätigung“ heißt: Die Behauptung ist nicht belegt, auch wenn der Artikel seriös aussieht. Der lockere Post nennt einen nachprüfbaren Grund."
+        titel: "Stadtfest Bergstedt abgesagt, weil die Stadt pleite ist",
+        text: "Das Stadtfest am Samstag findet nicht statt. Als Grund nennt die Stadt eine Unwetterwarnung für das Wochenende. Das Fest soll im September nachgeholt werden." },
+      aufloesung: "Die Überschrift behauptet etwas, das im Text gar nicht steht: Dort ist die Unwetterwarnung der Grund, und das Fest wird nachgeholt. Von Geldnot ist keine Rede."
     },
     {
-      id: "s12", thema: "KI bei Hausaufgaben", typ: "taeuscht", merkmal: "widerspruch",
+      id: "s12", thema: "KI bei Hausaufgaben", typ: "taeuscht", merkmal: "rechnung",
       echt: { format: "post", absender: "schule.digital", datum: "vor 5 Std.", likes: "3.530", shares: "960",
         text: "Krass, oder? 🤖 In einer Umfrage des Lehrerverbands Nordland unter 800 Lehrkräften sagen 6 von 10, dass sie schon mal eine Hausaufgabe bekommen haben, die vermutlich mit KI geschrieben war. Der Verband fordert jetzt klare Regeln." },
       fake: { format: "artikel", absender: "Lupe Nachrichten", rubrik: "Bildung", datum: "Heute, 09:40",
@@ -150,7 +151,7 @@ window.UMFRAGE_CONFIG = {
       aufloesung: "Aus „6 von 10 Lehrkräften haben es schon mal erlebt“ folgt nicht „fast alle Hausaufgaben“. Die Schlussfolgerung ist falsch, egal wie seriös die Seite aussieht."
     },
     {
-      id: "s13", thema: "Busfahrpreise", typ: "taeuscht", merkmal: "widerspruch",
+      id: "s13", thema: "Busfahrpreise", typ: "taeuscht", merkmal: "rechnung",
       echt: { format: "post", absender: "halden.unterwegs", datum: "vor 4 Std.", likes: "1.730", shares: "288",
         text: "Ab 1. März wird's teurer 🚌 Das Einzelticket in Halden kostet dann 3,20 € statt 3,00 €. Das hat der Stadtrat gestern beschlossen. Das Monatsticket bleibt beim alten Preis." },
       fake: { format: "artikel", absender: "Rundschau Kompakt", rubrik: "Region", datum: "Heute, 10:25",
@@ -159,16 +160,16 @@ window.UMFRAGE_CONFIG = {
       aufloesung: "Von 3,00 € auf 3,20 € sind knapp 7 Prozent, keine Verdreifachung. Die Überschrift widerspricht dem eigenen Text."
     },
     {
-      id: "s14", thema: "Rapper sagt Tour ab", typ: "taeuscht", merkmal: "vage",
+      id: "s14", thema: "Rapper sagt Tour ab", typ: "taeuscht", merkmal: "widerspruch",
       echt: { format: "post", absender: "musik.news.de", datum: "vor 2 Std.", likes: "9.410", shares: "1.870",
-        text: "Uff 😮 Rapper Leno K. sagt seine Tour wegen einer Stimmband-OP ab. Das hat er selbst auf seinem offiziellen Account bekannt gegeben. Die Konzerte werden im Herbst nachgeholt, Tickets bleiben gültig." },
+        text: "Uff 😮 Rapper Leno K. sagt seine Tour wegen einer Stimmband-OP ab. Die Konzerte werden im Herbst nachgeholt, die Tickets bleiben gültig. Gute Besserung!" },
       fake: { format: "artikel", absender: "Tagesbote", rubrik: "Kultur", datum: "Heute, 13:15",
         titel: "Rapper Leno K. beendet seine Karriere",
-        text: "Rapper Leno K. hat seine Tour abgesagt. Nach Informationen aus seinem Umfeld will der Musiker nie wieder auftreten. Er selbst hat sich dazu bisher nicht geäußert." },
-      aufloesung: "„Aus seinem Umfeld“ ist eine anonyme Quelle, und der Betroffene selbst hat nichts gesagt. Der Post beruft sich auf die eigene Mitteilung des Rappers."
+        text: "Rapper Leno K. hat seine Tour wegen einer Stimmband-OP abgesagt. Die Konzerte sollen im Herbst nachgeholt werden. Damit steht fest, dass der Musiker nie wieder auftreten wird." },
+      aufloesung: "Der Fake widerspricht sich selbst: Wenn die Konzerte im Herbst nachgeholt werden, tritt er wieder auf. Die Überschrift „beendet Karriere“ passt nicht zum Text."
     },
     {
-      id: "s15", thema: "Mietpreise", typ: "taeuscht", merkmal: "widerspruch",
+      id: "s15", thema: "Mietpreise", typ: "taeuscht", merkmal: "rechnung",
       echt: { format: "post", absender: "wohnen.kompakt", datum: "vor 6 Std.", likes: "2.087", shares: "655",
         text: "Mieten steigen weiter 🏠 Laut dem neuen Mietspiegel der Stadt Halden sind die Kaltmieten im letzten Jahr im Schnitt um 4 % gestiegen, auf 9,80 € pro Quadratmeter." },
       fake: { format: "artikel", absender: "Lupe Nachrichten", rubrik: "Wohnen", datum: "Heute, 07:30",
