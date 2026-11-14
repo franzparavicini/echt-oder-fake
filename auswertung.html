@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Auswertung Echt oder Fake</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=11">
 <style>
   .wrap { max-width: 880px; }
   .login { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -40,6 +40,14 @@
   td.cell small { display: block; font-weight: 400; opacity: .8; font-size: 0.72rem; }
   td.leer { color: var(--muted); background: var(--surface); font-weight: 400; }
   .notice { border: 1.5px dashed var(--fake); border-radius: 10px; padding: 10px 14px; font-size: 0.9rem; }
+  .abbildungen { display: grid; gap: 22px; }
+  .folie { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+  .folie svg { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 8px; }
+  .folie figcaption { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 0.88rem; color: var(--muted); }
+  .saetze { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 0.95rem; }
+  details summary { cursor: pointer; }
+  details[open] summary { margin-bottom: 10px; }
+  .trenner { padding-top: 12px; border-top: 1px solid var(--line); }
 </style>
 </head>
 <body>
@@ -63,7 +71,7 @@
   <div id="inhalt" class="stack-lg"></div>
 </main>
 
-<script src="config.js?v=10"></script>
+<script src="config.js?v=11"></script>
 <script>
 (() => {
   const C = window.UMFRAGE_CONFIG;
@@ -182,6 +190,357 @@
       }).join("")}</tr>`).join("")}</tbody></table></div>`;
   }
 
+  // ---------- Statistik: Spearman-Rangkorrelation mit p-Wert ----------
+  function raenge(werte) {
+    const idx = werte.map((v, i) => [v, i]).sort((a, b) => a[0] - b[0]);
+    const r = new Array(werte.length);
+    for (let i = 0; i < idx.length; ) {
+      let j = i;
+      while (j + 1 < idx.length && idx[j + 1][0] === idx[i][0]) j++;
+      const durchschnitt = (i + j) / 2 + 1; // gleiche Werte bekommen den mittleren Rang
+      for (let k = i; k <= j; k++) r[idx[k][1]] = durchschnitt;
+      i = j + 1;
+    }
+    return r;
+  }
+  function pearson(x, y) {
+    const n = x.length;
+    if (n < 3) return null;
+    const mx = x.reduce((s, v) => s + v, 0) / n, my = y.reduce((s, v) => s + v, 0) / n;
+    let sxy = 0, sxx = 0, syy = 0;
+    for (let i = 0; i < n; i++) { const dx = x[i] - mx, dy = y[i] - my; sxy += dx * dy; sxx += dx * dx; syy += dy * dy; }
+    return sxx && syy ? sxy / Math.sqrt(sxx * syy) : null;
+  }
+  const spearman = (x, y) => pearson(raenge(x), raenge(y));
+  function gammaln(x) {
+    const c = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+    let y = x, tmp = x + 5.5;
+    tmp -= (x + 0.5) * Math.log(tmp);
+    let ser = 1.000000000190015;
+    for (const ci of c) ser += ci / ++y;
+    return -tmp + Math.log(2.5066282746310005 * ser / x);
+  }
+  function betacf(a, b, x) {
+    const FPMIN = 1e-300;
+    const qab = a + b, qap = a + 1, qam = a - 1;
+    let c = 1, d = 1 - qab * x / qap;
+    if (Math.abs(d) < FPMIN) d = FPMIN;
+    d = 1 / d;
+    let h = d;
+    for (let m = 1; m <= 300; m++) {
+      const m2 = 2 * m;
+      let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+      d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+      c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+      d = 1 / d; h *= d * c;
+      aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+      d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+      c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+      d = 1 / d;
+      const del = d * c; h *= del;
+      if (Math.abs(del - 1) < 3e-12) break;
+    }
+    return h;
+  }
+  function betai(a, b, x) {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    const bt = Math.exp(gammaln(a + b) - gammaln(a) - gammaln(b) + a * Math.log(x) + b * Math.log(1 - x));
+    return x < (a + 1) / (a + b + 2) ? bt * betacf(a, b, x) / a : 1 - bt * betacf(b, a, 1 - x) / b;
+  }
+  // zweiseitiger p-Wert über die t-Verteilung, df = Freiheitsgrade
+  function pWert(r, df) {
+    if (r == null || df < 1) return null;
+    if (Math.abs(r) >= 1) return 0;
+    const t2 = r * r * df / (1 - r * r);
+    return betai(df / 2, 0.5, df / (df + t2));
+  }
+  // Partielle Korrelation: Zusammenhang x–y, wenn z (Drittvariable) herausgerechnet wird
+  function partiell(rxy, rxz, ryz) {
+    const nenner = Math.sqrt((1 - rxz * rxz) * (1 - ryz * ryz));
+    return rxy == null || rxz == null || ryz == null || !nenner ? null : (rxy - rxz * ryz) / nenner;
+  }
+
+  // ---------- Abbildungen im Folienformat (16:9, feste helle Farben für Beamer und PNG) ----------
+  const W = 1600, H = 900;
+  const F = { ink: "#17202c", muted: "#5d6877", grid: "#e2e6ec", akzent: "#23408e", box: "#d9e1f5", ok: "#1b7a50", no: "#c0391f", na: "#b9c0ca", weiss: "#ffffff" };
+  const FONT = "Helvetica Neue, Helvetica, Arial, sans-serif";
+  const zahl = (x, d = 2) => (x == null ? "–" : x.toFixed(d).replace(".", ",").replace("-", "−"));
+  const pText = (p) => (p == null ? "–" : p < 0.001 ? "p < 0,001" : `p = ${zahl(p, 3)}`);
+
+  function einordnen(r, p) {
+    if (r == null) return "zu wenige Daten für eine Korrelation";
+    const b = Math.abs(r);
+    const staerke = b < 0.1 ? "kein nennenswerter" : b < 0.3 ? "ein schwacher" : b < 0.5 ? "ein mittlerer" : "ein starker";
+    const richtung = b < 0.1 ? "" : r > 0 ? " positiver" : " negativer";
+    const sig = p == null ? "" : p < 0.05 ? ", statistisch signifikant" : ", statistisch nicht signifikant";
+    return `${staerke}${richtung} Zusammenhang${sig}`;
+  }
+
+  function rahmen(id, titel, untertitel, fuss, inhalt) {
+    return `<svg id="${id}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="${FONT}" role="img" aria-label="${esc(titel)}">
+      <rect width="${W}" height="${H}" fill="${F.weiss}"/>
+      <text x="80" y="88" font-size="46" font-weight="700" fill="${F.ink}">${esc(titel)}</text>
+      <text x="80" y="138" font-size="27" fill="${F.muted}">${esc(untertitel)}</text>
+      ${inhalt}
+      <text x="80" y="${H - 32}" font-size="19" fill="${F.muted}">${esc(fuss)}</text>
+    </svg>`;
+  }
+
+  function quantil(sortiert, q) {
+    const pos = (sortiert.length - 1) * q, u = Math.floor(pos), o = Math.ceil(pos);
+    return sortiert[u] + (sortiert[o] - sortiert[u]) * (pos - u);
+  }
+
+  // Boxplot: gruppen = [{label, werte:[...]}], y von 0 bis yMax
+  function boxplot(id, titel, untertitel, fuss, gruppen, yMax, yTitel) {
+    const L = 150, R = 60, T = 190, B = 160, pw = W - L - R, ph = H - T - B;
+    const y = (v) => T + ph - (v / yMax) * ph;
+    const band = pw / gruppen.length, bw = Math.min(150, band * 0.5);
+    let s = "";
+    for (let v = 0; v <= yMax; v += 3) {
+      s += `<line x1="${L}" x2="${L + pw}" y1="${y(v)}" y2="${y(v)}" stroke="${F.grid}" stroke-width="2"/>
+            <text x="${L - 18}" y="${y(v) + 9}" font-size="24" fill="${F.muted}" text-anchor="end">${v}</text>`;
+    }
+    s += `<text transform="translate(52 ${T + ph / 2}) rotate(-90)" font-size="24" fill="${F.muted}" text-anchor="middle">${esc(yTitel)}</text>`;
+    gruppen.forEach((g, i) => {
+      const cx = L + band * i + band / 2;
+      const w = [...g.werte].sort((a, b) => a - b), n = w.length;
+      s += `<text x="${cx}" y="${T + ph + 46}" font-size="25" font-weight="700" fill="${F.ink}" text-anchor="middle">${esc(g.label)}</text>
+            <text x="${cx}" y="${T + ph + 80}" font-size="21" fill="${F.muted}" text-anchor="middle">n = ${n}</text>`;
+      if (!n) { s += `<text x="${cx}" y="${y(yMax / 2)}" font-size="21" fill="${F.muted}" text-anchor="middle">keine Daten</text>`; return; }
+      if (n < 5) {
+        // zu wenige Werte für einen sinnvollen Boxplot: Einzelwerte zeigen
+        w.forEach((v, k) => { s += `<circle cx="${cx + (k - (n - 1) / 2) * 22}" cy="${y(v)}" r="9" fill="${F.akzent}" fill-opacity="0.75"><title>${esc(g.label)}: ${v} Punkte</title></circle>`; });
+        s += `<text x="${cx}" y="${T - 14}" font-size="19" fill="${F.muted}" text-anchor="middle">Einzelwerte (n &lt; 5)</text>`;
+        return;
+      }
+      const q1 = quantil(w, 0.25), med = quantil(w, 0.5), q3 = quantil(w, 0.75), iqr = q3 - q1;
+      const lo = w.find((v) => v >= q1 - 1.5 * iqr), hi = [...w].reverse().find((v) => v <= q3 + 1.5 * iqr);
+      const tip = `${g.label}: Median ${zahl(med, 1)}, mittlere 50 % von ${zahl(q1, 1)} bis ${zahl(q3, 1)}, n = ${n}`;
+      s += `<line x1="${cx}" x2="${cx}" y1="${y(hi)}" y2="${y(q3)}" stroke="${F.akzent}" stroke-width="3"/>
+            <line x1="${cx}" x2="${cx}" y1="${y(q1)}" y2="${y(lo)}" stroke="${F.akzent}" stroke-width="3"/>
+            <line x1="${cx - bw / 4}" x2="${cx + bw / 4}" y1="${y(hi)}" y2="${y(hi)}" stroke="${F.akzent}" stroke-width="3"/>
+            <line x1="${cx - bw / 4}" x2="${cx + bw / 4}" y1="${y(lo)}" y2="${y(lo)}" stroke="${F.akzent}" stroke-width="3"/>
+            <rect x="${cx - bw / 2}" y="${y(q3)}" width="${bw}" height="${Math.max(3, y(q1) - y(q3))}" rx="4" fill="${F.box}" stroke="${F.akzent}" stroke-width="3"><title>${esc(tip)}</title></rect>
+            <line x1="${cx - bw / 2}" x2="${cx + bw / 2}" y1="${y(med)}" y2="${y(med)}" stroke="${F.ink}" stroke-width="5"/>`;
+      w.filter((v) => v < lo || v > hi).forEach((v) => {
+        s += `<circle cx="${cx}" cy="${y(v)}" r="8" fill="${F.weiss}" stroke="${F.akzent}" stroke-width="3"><title>Ausreißer: ${v} Punkte</title></circle>`;
+      });
+    });
+    return rahmen(id, titel, untertitel, fuss, s);
+  }
+
+  // Streudiagramm: Stufe (x, leicht gestreut) gegen Punkte (y)
+  function streu(id, titel, untertitel, fuss, punkte, stufen, yMax, yTitel) {
+    const L = 150, R = 60, T = 190, B = 160, pw = W - L - R, ph = H - T - B;
+    const band = pw / stufen.length;
+    const x = (i) => L + band * i + band / 2, y = (v) => T + ph - (v / yMax) * ph;
+    let s = "";
+    for (let v = 0; v <= yMax; v += 3) {
+      s += `<line x1="${L}" x2="${L + pw}" y1="${y(v)}" y2="${y(v)}" stroke="${F.grid}" stroke-width="2"/>
+            <text x="${L - 18}" y="${y(v) + 9}" font-size="24" fill="${F.muted}" text-anchor="end">${v}</text>`;
+    }
+    s += `<text transform="translate(52 ${T + ph / 2}) rotate(-90)" font-size="24" fill="${F.muted}" text-anchor="middle">${esc(yTitel)}</text>`;
+    stufen.forEach((st, i) => { s += `<text x="${x(i)}" y="${T + ph + 46}" font-size="25" font-weight="700" fill="${F.ink}" text-anchor="middle">${esc(st)}</text>`; });
+    // feste Streuung pro Punkt (aus dem Index berechnet), damit das Bild bei jedem Laden gleich aussieht
+    punkte.forEach((p, k) => {
+      const jx = (((k * 37) % 23) / 22 - 0.5) * band * 0.5, jy = (((k * 53) % 17) / 16 - 0.5) * 0.5;
+      s += `<circle cx="${x(p.x) + jx}" cy="${y(p.y + jy)}" r="8" fill="${F.akzent}" fill-opacity="0.45"><title>${esc(stufen[p.x])}: ${p.y} Punkte</title></circle>`;
+    });
+    stufen.forEach((st, i) => {
+      const w = punkte.filter((p) => p.x === i).map((p) => p.y).sort((a, b) => a - b);
+      if (!w.length) return;
+      const med = quantil(w, 0.5);
+      s += `<line x1="${x(i) - band * 0.3}" x2="${x(i) + band * 0.3}" y1="${y(med)}" y2="${y(med)}" stroke="${F.ink}" stroke-width="5"><title>Median ${zahl(med, 1)}</title></line>`;
+    });
+    s += `<line x1="${L + pw - 330}" x2="${L + pw - 290}" y1="${T - 26}" y2="${T - 26}" stroke="${F.ink}" stroke-width="5"/>
+          <text x="${L + pw - 280}" y="${T - 18}" font-size="21" fill="${F.muted}">Median je Stufe</text>`;
+    return rahmen(id, titel, untertitel, fuss, s);
+  }
+
+  // Horizontale Balken: daten = [{label, wert, text}], max = Skalenende
+  function hbalken(id, titel, untertitel, fuss, daten, max) {
+    const L = 430, R = 160, T = 200, B = 110, pw = W - L - R, ph = H - T - B;
+    const zeile = ph / daten.length, bh = Math.min(64, zeile * 0.62);
+    let s = "";
+    daten.forEach((d, i) => {
+      const cy = T + zeile * i + zeile / 2, w = max ? (d.wert / max) * pw : 0;
+      s += `<text x="${L - 24}" y="${cy + 9}" font-size="26" fill="${F.ink}" text-anchor="end">${esc(d.label)}</text>
+            <rect x="${L}" y="${cy - bh / 2}" width="${pw}" height="${bh}" fill="${F.grid}" rx="4"/>
+            <rect x="${L}" y="${cy - bh / 2}" width="${Math.max(0, w)}" height="${bh}" fill="${F.akzent}" rx="4"><title>${esc(d.label)}: ${esc(d.text)}</title></rect>
+            <text x="${L + pw + 20}" y="${cy + 10}" font-size="28" font-weight="700" fill="${F.ink}">${esc(d.text)}</text>`;
+    });
+    return rahmen(id, titel, untertitel, fuss, s);
+  }
+
+  // Gestapelte Balken richtig / falsch / keine Ahnung
+  function stapel(id, titel, untertitel, fuss, daten) {
+    const L = 470, R = 60, T = 250, B = 130, pw = W - L - R, ph = H - T - B;
+    const zeile = ph / daten.length, bh = Math.min(90, zeile * 0.55);
+    let s = "";
+    [["richtig", F.ok], ["falsch", F.no], ["keine Ahnung", F.na]].forEach(([t, c], i) => {
+      s += `<rect x="${L + i * 230}" y="${T - 72}" width="22" height="22" rx="4" fill="${c}"/>
+            <text x="${L + i * 230 + 32}" y="${T - 53}" font-size="23" fill="${F.ink}">${t}</text>`;
+    });
+    daten.forEach((d, i) => {
+      const cy = T + zeile * i + zeile / 2;
+      s += `<text x="${L - 24}" y="${cy - 4}" font-size="27" font-weight="700" fill="${F.ink}" text-anchor="end">${esc(d.label)}</text>
+            <text x="${L - 24}" y="${cy + 28}" font-size="21" fill="${F.muted}" text-anchor="end">${esc(d.hinweis)}</text>`;
+      let x0 = L;
+      [[d.ok, F.ok, "richtig"], [d.no, F.no, "falsch"], [d.na, F.na, "keine Ahnung"]].forEach(([v, c, t]) => {
+        const w = (v / 100) * pw;
+        if (w <= 0) return;
+        s += `<rect x="${x0}" y="${cy - bh / 2}" width="${Math.max(0, w - 2)}" height="${bh}" fill="${c}"><title>${t}: ${Math.round(v)} %</title></rect>`;
+        if (w > 70) s += `<text x="${x0 + 16}" y="${cy + 10}" font-size="27" font-weight="700" fill="${c === F.na ? F.ink : F.weiss}">${Math.round(v)} %</text>`;
+        x0 += w;
+      });
+    });
+    return rahmen(id, titel, untertitel, fuss, s);
+  }
+
+  // Kennzahlen-Tabelle als Bild
+  function kennzahlenBild(id, titel, untertitel, fuss, zeilen) {
+    const L = 80, T = 230, zh = 112;
+    const sp = [L, 980, 1200, 1430];
+    let s = ["Zusammenhang", "ρ (Spearman)", "p-Wert", "n"].map((t, i) =>
+      `<text x="${sp[i]}" y="${T - 26}" font-size="22" font-weight="700" fill="${F.muted}">${t}</text>`).join("");
+    zeilen.forEach((z, i) => {
+      const yy = T + i * zh;
+      s += `<line x1="${L}" x2="${W - 80}" y1="${yy}" y2="${yy}" stroke="${F.grid}" stroke-width="2"/>
+            <text x="${sp[0]}" y="${yy + 50}" font-size="27" font-weight="700" fill="${F.ink}">${esc(z.label)}</text>
+            <text x="${sp[0]}" y="${yy + 86}" font-size="21" fill="${F.muted}">${esc(z.deutung)}</text>
+            <text x="${sp[1]}" y="${yy + 62}" font-size="34" font-weight="700" fill="${F.ink}">${zahl(z.r)}</text>
+            <text x="${sp[2]}" y="${yy + 62}" font-size="28" fill="${F.ink}">${esc(pText(z.p))}</text>
+            <text x="${sp[3]}" y="${yy + 62}" font-size="28" fill="${F.ink}">${z.n}</text>`;
+    });
+    return rahmen(id, titel, untertitel, fuss, s);
+  }
+
+  // ---------- Bereich „Für die Präsentation“ ----------
+  function praesentation(rows, demo) {
+    const stand = new Date().toLocaleDateString("de-DE");
+    const daten = rows.map((r) => ({
+      a: C.alter.indexOf(r.alter), s: C.screentime.indexOf(r.screentime), p: Number(r.richtig)
+    })).filter((d) => d.a >= 0 && d.s >= 0 && Number.isFinite(d.p));
+    const n = daten.length;
+    const fuss = `${demo ? "BEISPIELDATEN · " : ""}Quelle: eigene Online-Umfrage „Echt oder Fake?“, n = ${n}, Stand: ${stand}`;
+
+    const rSP = spearman(daten.map((d) => d.s), daten.map((d) => d.p));
+    const rAP = spearman(daten.map((d) => d.a), daten.map((d) => d.p));
+    const rAS = spearman(daten.map((d) => d.a), daten.map((d) => d.s));
+    const pSP = pWert(rSP, n - 2), pAP = pWert(rAP, n - 2), pAS = pWert(rAS, n - 2);
+    const rSPa = partiell(rSP, rAS, rAP), pSPa = pWert(rSPa, n - 3);
+
+    const alle = antworten(rows);
+    const anteil = (liste, e) => (liste.length ? (liste.filter((x) => x.ergebnis === e).length / liste.length) * 100 : 0);
+    const ki = S.filter((s) => s.ki).map((s) => {
+      const g = alle.filter((x) => x.szenario.id === s.id);
+      return { label: s.thema, hinweis: s.ki === "fake" ? "KI-Siegel am Fake" : "KI-Siegel an der echten Meldung", ok: anteil(g, "richtig"), no: anteil(g, "falsch"), na: anteil(g, "keine_ahnung") };
+    });
+    const typen = Object.keys(C.typen).map((t) => {
+      const g = alle.filter((x) => x.szenario.typ === t);
+      const v = anteil(g, "richtig");
+      return { label: C.typen[t], wert: v, text: `${Math.round(v)} %` };
+    });
+    const zaehl = (feld, werte) => werte.map((w) => { const k = daten.filter((d) => d[feld] === werte.indexOf(w)).length; return { label: w, wert: k, text: String(k) }; });
+    const maxZ = (arr) => Math.max(1, ...arr.map((d) => d.wert));
+    const stichA = zaehl("a", C.alter), stichS = zaehl("s", C.screentime);
+
+    const yT = "richtig erkannte Paare (von 15)";
+    const abb = [
+      { id: "abb-stichprobe-alter", folie: "Folie 5 · Stichprobe", name: "01_stichprobe_alter",
+        svg: hbalken("abb-stichprobe-alter", "Wer hat mitgemacht? Nach Alter", `${n} Teilnehmende insgesamt`, fuss, stichA, maxZ(stichA)) },
+      { id: "abb-stichprobe-sm", folie: "Folie 5 · Stichprobe", name: "02_stichprobe_social_media",
+        svg: hbalken("abb-stichprobe-sm", "Wer hat mitgemacht? Nach Social-Media-Zeit pro Tag", `${n} Teilnehmende insgesamt`, fuss, stichS, maxZ(stichS)) },
+      { id: "abb-box-sm", folie: "Folie 6 · Ergebnis Social Media", name: "03_boxplot_social_media",
+        svg: boxplot("abb-box-sm", "Trefferquote nach täglicher Social-Media-Zeit", `Spearman ρ = ${zahl(rSP)}, ${pText(pSP)}: ${einordnen(rSP, pSP)}`, fuss,
+          C.screentime.map((st, i) => ({ label: st, werte: daten.filter((d) => d.s === i).map((d) => d.p) })), 15, yT) },
+      { id: "abb-box-alter", folie: "Folie 7 · Ergebnis Alter", name: "04_boxplot_alter",
+        svg: boxplot("abb-box-alter", "Trefferquote nach Alter", `Spearman ρ = ${zahl(rAP)}, ${pText(pAP)}: ${einordnen(rAP, pAP)}`, fuss,
+          C.alter.map((al, i) => ({ label: al, werte: daten.filter((d) => d.a === i).map((d) => d.p) })), 15, yT) },
+      { id: "abb-streu", folie: "Folie 6 · Streudiagramm (Alternative)", name: "05_streudiagramm_social_media",
+        svg: streu("abb-streu", "Streudiagramm: Social-Media-Zeit und Trefferquote", `Jeder Punkt ist eine Person · Spearman ρ = ${zahl(rSP)}, ${pText(pSP)}`, fuss,
+          daten.map((d) => ({ x: d.s, y: d.p })), C.screentime, 15, yT) },
+      { id: "abb-typ", folie: "Folie 8 · Aufmachung", name: "06_aufmachung",
+        svg: hbalken("abb-typ", "Täuscht die Aufmachung?", "Anteil richtig erkannter Paare je Typ (je 5 Paare)", fuss, typen, 100) },
+      { id: "abb-ki", folie: "Folie 8 / Teaser · KI-Siegel", name: "07_ki_siegel",
+        svg: stapel("abb-ki", "Lassen sich die Leute vom KI-Siegel leiten?", "Antworten bei den beiden Paaren mit „Mit KI erstellt“-Siegel", fuss, ki) },
+      { id: "abb-kennzahlen", folie: "Folie 9 · Korrelation ≠ Kausalität", name: "08_korrelationen",
+        svg: kennzahlenBild("abb-kennzahlen", "Korrelationen im Überblick", "Rangkorrelation nach Spearman, zweiseitig getestet (Signifikanz bei p < 0,05)", fuss, [
+          { label: "Social-Media-Zeit ↔ Trefferquote", deutung: einordnen(rSP, pSP), r: rSP, p: pSP, n },
+          { label: "Alter ↔ Trefferquote", deutung: einordnen(rAP, pAP), r: rAP, p: pAP, n },
+          { label: "Alter ↔ Social-Media-Zeit (mögliche Drittvariable)", deutung: einordnen(rAS, pAS), r: rAS, p: pAS, n },
+          { label: "Social-Media-Zeit ↔ Trefferquote ohne Alterseffekt", deutung: `partielle Korrelation: ${einordnen(rSPa, pSPa)}`, r: rSPa, p: pSPa, n }
+        ]) }
+    ];
+
+    const satz = (was, r, p) => r == null ? `${was}: noch zu wenige Daten.` :
+      `${was}: Spearman ρ = ${zahl(r)}, ${pText(p)}, n = ${n}. Das ist ${einordnen(r, p)}.`;
+    const texte = [
+      satz("Zusammenhang zwischen täglicher Social-Media-Zeit und Trefferquote", rSP, pSP),
+      satz("Zusammenhang zwischen Alter und Trefferquote", rAP, pAP),
+      satz("Zusammenhang zwischen Alter und Social-Media-Zeit", rAS, pAS),
+      rSPa == null ? "" : `Rechnet man das Alter heraus (partielle Korrelation), beträgt der Zusammenhang zwischen Social-Media-Zeit und Trefferquote ρ = ${zahl(rSPa)} (${pText(pSPa)}).`
+    ].filter(Boolean);
+
+    return `
+      <section class="block" id="praesentation">
+        <h2>Abbildungen für die Präsentation</h2>
+        <p class="muted small">Jede Abbildung hat das Folienformat 16:9 mit Titel, Kennzahl und Quellenangabe. „Als Bild speichern“ lädt sie als PNG (1920 × 1080) herunter, das ihr direkt auf eine Folie zieht. Fahrt mit der Maus über Boxen und Punkte, um die genauen Werte zu sehen.</p>
+        ${n < 20 ? `<p class="notice">Erst ${n} Teilnehmende: Korrelationen und Boxplots sind noch sehr unsicher. Aussagekräftig wird es ab etwa 60.</p>` : ""}
+        <div class="abbildungen">
+          ${abb.map((a, i) => `
+            <figure class="folie">
+              ${a.svg}
+              <figcaption><span><b>Abb. ${i + 1}</b> · ${esc(a.folie)}</span><button class="link" data-png="${a.id}" data-name="${a.name}">Als Bild speichern</button></figcaption>
+            </figure>`).join("")}
+        </div>
+        <div class="panel stack">
+          <h3>Sätze für Dokumentation und Folien</h3>
+          <p class="muted small">So schreibt man die Ergebnisse wissenschaftlich korrekt. Die Werte aktualisieren sich mit den Daten.</p>
+          <ul class="saetze">${texte.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
+          <button class="link" id="saetze-kopieren" data-text="${esc(texte.join("\n"))}">Sätze kopieren</button>
+        </div>
+        <details class="panel">
+          <summary><b>So lest ihr die Abbildungen</b></summary>
+          <ul class="saetze">
+            <li><b>Boxplot:</b> Die Box enthält die mittleren 50 % der Teilnehmenden, der dicke Strich ist der Median (die Hälfte liegt darüber, die Hälfte darunter). Die Linien („Whisker“) reichen bis zu den übrigen Werten, einzelne Kreise sind Ausreißer.</li>
+            <li><b>ρ (rho):</b> Rangkorrelation nach Spearman, von −1 bis +1. Wir verwenden sie statt r, weil Alter und Social-Media-Zeit in geordneten Stufen abgefragt wurden. Faustregel: unter 0,1 kein, ab 0,1 schwacher, ab 0,3 mittlerer, ab 0,5 starker Zusammenhang.</li>
+            <li><b>p-Wert:</b> Wahrscheinlichkeit, so einen Zusammenhang rein zufällig zu finden, obwohl es in Wirklichkeit keinen gibt. Unter 0,05 gilt er als statistisch signifikant.</li>
+            <li><b>Partielle Korrelation:</b> Zeigt, ob der Zusammenhang zwischen Social-Media-Zeit und Trefferquote bestehen bleibt, wenn man das Alter als Drittvariable herausrechnet (vgl. Folie „Interpretation von Korrelationen“).</li>
+            <li><b>Wichtig:</b> Alle Werte zeigen Zusammenhänge, keine Ursachen.</li>
+          </ul>
+        </details>
+      </section>`;
+  }
+
+  // PNG-Export und Kopieren
+  document.addEventListener("click", async (e) => {
+    const knopf = e.target.closest("[data-png]");
+    if (knopf) {
+      const svg = document.getElementById(knopf.dataset.png);
+      const bild = new Image();
+      bild.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(new XMLSerializer().serializeToString(svg));
+      try { await bild.decode(); } catch { knopf.textContent = "Speichern fehlgeschlagen"; return; }
+      const c = document.createElement("canvas");
+      c.width = 1920; c.height = 1080;
+      const g = c.getContext("2d");
+      g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height);
+      g.drawImage(bild, 0, 0, c.width, c.height);
+      const a = document.createElement("a");
+      a.href = c.toDataURL("image/png");
+      a.download = `${knopf.dataset.name}.png`;
+      a.click();
+      return;
+    }
+    const kopieren = e.target.closest("#saetze-kopieren");
+    if (kopieren) {
+      try { await navigator.clipboard.writeText(kopieren.dataset.text); kopieren.textContent = "Kopiert"; }
+      catch { kopieren.textContent = "Kopieren nicht möglich, bitte markieren"; }
+    }
+  });
+
   // ---------- Darstellung ----------
   function render(rows, demo) {
     aktuelleRows = rows;
@@ -225,6 +584,10 @@
         <div class="kpi"><b>${pct(mittel(rows.map(kaQuote)))}</b><span>„Keine Ahnung“</span></div>
         <div class="kpi"><b>${pct(anteilRichtig(sicher))}</b><span>richtig, wenn „sicher“ gewählt</span></div>
       </div>
+
+      ${praesentation(rows, demo)}
+
+      <h2 class="trenner">Weitere Auswertungen</h2>
 
       <section class="block">
         <h2>Nach täglicher Social-Media-Zeit</h2>
