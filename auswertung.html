@@ -65,7 +65,7 @@
     <button class="btn" type="submit">Daten laden</button>
     <button class="btn btn-ghost" type="button" id="demo">Simulation</button>
   </form>
-  <label class="schalter"><input type="checkbox" id="zusammen"> Altersgruppen zusammenfassen (unter 20 / 20–44 / 45+), sinnvoll bei wenigen Teilnehmenden</label>
+  <label class="schalter"><input type="checkbox" id="zusammen"> Altersgruppen zusammenfassen (unter 20 / 20–44 / 45–59 / 60+), sinnvoll bei wenigen Teilnehmenden</label>
   <div class="werkzeuge">
     <span class="status" id="status" aria-live="polite"></span>
     <button class="link" id="csv" hidden>Rohdaten als CSV herunterladen</button>
@@ -84,8 +84,8 @@
   let aktuelleRows = [];
   let timer = null;
   let letzte = null; // zuletzt gezeigte Daten, um beim Umschalten neu zu zeichnen
-  const ALTER_3 = ["unter 20", "20–44", "45+"];
-  const ZU_3 = { "unter 16": "unter 20", "16–19": "unter 20", "20–29": "20–44", "30–44": "20–44", "45–59": "45+", "60+": "45+" };
+  const ALTER_4 = ["unter 20", "20–44", "45–59", "60+"];
+  const ZU_4 = { "unter 16": "unter 20", "16–19": "unter 20", "20–29": "20–44", "30–44": "20–44", "45–59": "45–59", "60+": "60+" };
   let altersstufen = C.alter;
   $("#zusammen").addEventListener("change", () => { if (letzte) render(letzte.rows, letzte.demo); });
 
@@ -565,8 +565,8 @@
     letzte = { rows: rohdaten, demo };
     aktuelleRows = demo ? [] : rohdaten; // CSV nur für echte Daten
     const zusammen = $("#zusammen").checked;
-    altersstufen = zusammen ? ALTER_3 : C.alter;
-    const rows = zusammen ? rohdaten.map((r) => ({ ...r, alter: ZU_3[r.alter] || r.alter })) : rohdaten;
+    altersstufen = zusammen ? ALTER_4 : C.alter;
+    const rows = zusammen ? rohdaten.map((r) => ({ ...r, alter: ZU_4[r.alter] || r.alter })) : rohdaten;
     $("#csv").hidden = !aktuelleRows.length;
     const inhalt = $("#inhalt");
     if (!rows.length) { inhalt.innerHTML = `<p class="muted">Noch keine Antworten. Sobald jemand die Umfrage abschickt, erscheint sie hier.</p>`; return; }
