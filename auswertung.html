@@ -47,6 +47,8 @@
   .saetze { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 0.95rem; }
   details summary { cursor: pointer; }
   details[open] summary { margin-bottom: 10px; }
+  .schalter { display: flex; gap: 10px; align-items: center; font-size: 0.92rem; }
+  .schalter input { width: 20px; height: 20px; accent-color: var(--accent); }
   .trenner { padding-top: 12px; border-top: 1px solid var(--line); }
 </style>
 </head>
@@ -61,8 +63,9 @@
   <form class="login" id="login">
     <input id="key" type="password" placeholder="Auswertungs-Passwort" autocomplete="current-password">
     <button class="btn" type="submit">Daten laden</button>
-    <button class="btn btn-ghost" type="button" id="demo">Beispieldaten</button>
+    <button class="btn btn-ghost" type="button" id="demo">Simulation</button>
   </form>
+  <label class="schalter"><input type="checkbox" id="zusammen"> Altersgruppen zusammenfassen (unter 20 / 20–44 / 45+), sinnvoll bei wenigen Teilnehmenden</label>
   <div class="werkzeuge">
     <span class="status" id="status" aria-live="polite"></span>
     <button class="link" id="csv" hidden>Rohdaten als CSV herunterladen</button>
@@ -80,6 +83,11 @@
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   let aktuelleRows = [];
   let timer = null;
+  let letzte = null; // zuletzt gezeigte Daten, um beim Umschalten neu zu zeichnen
+  const ALTER_3 = ["unter 20", "20–44", "45+"];
+  const ZU_3 = { "unter 16": "unter 20", "16–19": "unter 20", "20–29": "20–44", "30–44": "20–44", "45–59": "45+", "60+": "45+" };
+  let altersstufen = C.alter;
+  $("#zusammen").addEventListener("change", () => { if (letzte) render(letzte.rows, letzte.demo); });
 
   try { $("#key").value = localStorage.getItem("fn_key") || ""; } catch {}
 
@@ -123,26 +131,33 @@
     a.click();
   });
 
-  // ---------- erfundene Beispieldaten für die Vorschau ----------
+  // ---------- Simulation: erfundene Daten, um die Auswertung vorzuführen ----------
+  // Wird überall als „SIMULIERTE DATEN“ gekennzeichnet und nie mit echten Antworten vermischt.
   function beispiel() {
     const rows = [];
     const schw = { quelle: 0.88, inhalt: 0.66, taeuscht: 0.4 };
-    for (let n = 0; n < 160; n++) {
-      const a = Math.floor(Math.random() * C.alter.length);
-      const s = Math.floor(Math.random() * C.screentime.length);
-      const row = { alter: C.alter[a], screentime: C.screentime[s] };
-      let r = 0, f = 0, k = 0;
-      S.forEach((sz) => {
-        const p = Math.max(0.15, Math.min(0.97, schw[sz.typ] - 0.03 * s + (a === 5 ? -0.06 : 0) + (Math.random() - 0.5) * 0.15));
-        const x = Math.random();
-        const erg = x < 0.07 ? "keine_ahnung" : x < 0.07 + p * 0.93 ? "richtig" : "falsch";
-        row[`${sz.id}_ergebnis`] = erg;
-        row[`${sz.id}_sicher`] = erg === "keine_ahnung" ? "" : Math.random() < 0.5 + 0.05 * s ? "sicher" : "geraten";
-        erg === "richtig" ? r++ : erg === "falsch" ? f++ : k++;
-      });
-      Object.assign(row, { richtig: r, falsch: f, keine_ahnung: k, anzahl: S.length, quote: Math.round(r / S.length * 100) });
-      rows.push(row);
-    }
+    const proAlter = { "unter 16": 20, "16–19": 40, "20–29": 24, "30–44": 19, "45–59": 22, "60+": 8 };
+    // Jüngere nutzen im Schnitt mehr Social Media
+    const smGewicht = { "unter 16": [1, 2, 4, 4, 3], "16–19": [1, 2, 4, 5, 4], "20–29": [2, 3, 4, 3, 2], "30–44": [3, 4, 3, 2, 1], "45–59": [4, 4, 2, 1, 1], "60+": [5, 3, 2, 1, 0] };
+    const ziehe = (gew) => { let x = Math.random() * gew.reduce((t, v) => t + v, 0); for (let i = 0; i < gew.length; i++) { x -= gew[i]; if (x < 0) return i; } return gew.length - 1; };
+    Object.entries(proAlter).forEach(([alter, anzahl]) => {
+      const a = C.alter.indexOf(alter);
+      for (let n = 0; n < anzahl; n++) {
+        const s = ziehe(smGewicht[alter]);
+        const row = { alter, screentime: C.screentime[s] };
+        let r = 0, f = 0, k = 0;
+        S.forEach((sz) => {
+          const p = Math.max(0.15, Math.min(0.97, schw[sz.typ] - 0.03 * s + (a === 5 ? -0.08 : 0) + (Math.random() - 0.5) * 0.15));
+          const x = Math.random();
+          const erg = x < 0.07 ? "keine_ahnung" : x < 0.07 + p * 0.93 ? "richtig" : "falsch";
+          row[`${sz.id}_ergebnis`] = erg;
+          row[`${sz.id}_sicher`] = erg === "keine_ahnung" ? "" : Math.random() < 0.5 + 0.05 * s ? "sicher" : "geraten";
+          erg === "richtig" ? r++ : erg === "falsch" ? f++ : k++;
+        });
+        Object.assign(row, { richtig: r, falsch: f, keine_ahnung: k, anzahl: S.length, quote: Math.round(r / S.length * 100) });
+        rows.push(row);
+      }
+    });
     return rows;
   }
 
@@ -277,12 +292,15 @@
     return `${staerke}${richtung} Zusammenhang${sig}`;
   }
 
+  let wasserzeichen = false;
   function rahmen(id, titel, untertitel, fuss, inhalt) {
+    const wz = wasserzeichen ? `<text x="${W / 2}" y="${H / 2 + 40}" font-size="120" font-weight="700" fill="#c0391f" fill-opacity="0.10" text-anchor="middle" transform="rotate(-18 ${W / 2} ${H / 2})">SIMULATION</text>` : "";
     return `<svg id="${id}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="${FONT}" role="img" aria-label="${esc(titel)}">
       <rect width="${W}" height="${H}" fill="${F.weiss}"/>
       <text x="80" y="88" font-size="46" font-weight="700" fill="${F.ink}">${esc(titel)}</text>
       <text x="80" y="138" font-size="27" fill="${F.muted}">${esc(untertitel)}</text>
       ${inhalt}
+      ${wz}
       <text x="80" y="${H - 32}" font-size="19" fill="${F.muted}">${esc(fuss)}</text>
     </svg>`;
   }
@@ -346,7 +364,7 @@
     // feste Streuung pro Punkt (aus dem Index berechnet), damit das Bild bei jedem Laden gleich aussieht
     punkte.forEach((p, k) => {
       const jx = (((k * 37) % 23) / 22 - 0.5) * band * 0.5, jy = (((k * 53) % 17) / 16 - 0.5) * 0.5;
-      s += `<circle cx="${x(p.x) + jx}" cy="${y(p.y + jy)}" r="8" fill="${F.akzent}" fill-opacity="0.45"><title>${esc(stufen[p.x])}: ${p.y} Punkte</title></circle>`;
+      s += `<circle cx="${x(p.x) + jx}" cy="${y(Math.min(yMax, Math.max(0, p.y + jy)))}" r="8" fill="${F.akzent}" fill-opacity="0.45"><title>${esc(stufen[p.x])}: ${p.y} Punkte</title></circle>`;
     });
     stufen.forEach((st, i) => {
       const w = punkte.filter((p) => p.x === i).map((p) => p.y).sort((a, b) => a - b);
@@ -419,12 +437,13 @@
 
   // ---------- Bereich „Für die Präsentation“ ----------
   function praesentation(rows, demo) {
+    wasserzeichen = demo;
     const stand = new Date().toLocaleDateString("de-DE");
     const daten = rows.map((r) => ({
-      a: C.alter.indexOf(r.alter), s: C.screentime.indexOf(r.screentime), p: Number(r.richtig)
+      a: altersstufen.indexOf(r.alter), s: C.screentime.indexOf(r.screentime), p: Number(r.richtig)
     })).filter((d) => d.a >= 0 && d.s >= 0 && Number.isFinite(d.p));
     const n = daten.length;
-    const fuss = `${demo ? "BEISPIELDATEN · " : ""}Quelle: eigene Online-Umfrage „Echt oder Fake?“, n = ${n}, Stand: ${stand}`;
+    const fuss = `${demo ? "SIMULIERTE DATEN, KEINE ECHTEN ERGEBNISSE · " : ""}Quelle: eigene Online-Umfrage „Echt oder Fake?“, n = ${n}, Stand: ${stand}`;
 
     const rSP = spearman(daten.map((d) => d.s), daten.map((d) => d.p));
     const rAP = spearman(daten.map((d) => d.a), daten.map((d) => d.p));
@@ -445,7 +464,7 @@
     });
     const zaehl = (feld, werte) => werte.map((w) => { const k = daten.filter((d) => d[feld] === werte.indexOf(w)).length; return { label: w, wert: k, text: String(k) }; });
     const maxZ = (arr) => Math.max(1, ...arr.map((d) => d.wert));
-    const stichA = zaehl("a", C.alter), stichS = zaehl("s", C.screentime);
+    const stichA = zaehl("a", altersstufen), stichS = zaehl("s", C.screentime);
 
     const yT = "richtig erkannte Paare (von 15)";
     const abb = [
@@ -458,7 +477,7 @@
           C.screentime.map((st, i) => ({ label: st, werte: daten.filter((d) => d.s === i).map((d) => d.p) })), 15, yT) },
       { id: "abb-box-alter", folie: "Folie 7 · Ergebnis Alter", name: "04_boxplot_alter",
         svg: boxplot("abb-box-alter", "Trefferquote nach Alter", `Spearman ρ = ${zahl(rAP)}, ${pText(pAP)}: ${einordnen(rAP, pAP)}`, fuss,
-          C.alter.map((al, i) => ({ label: al, werte: daten.filter((d) => d.a === i).map((d) => d.p) })), 15, yT) },
+          altersstufen.map((al, i) => ({ label: al, werte: daten.filter((d) => d.a === i).map((d) => d.p) })), 15, yT) },
       { id: "abb-streu", folie: "Folie 6 · Streudiagramm (Alternative)", name: "05_streudiagramm_social_media",
         svg: streu("abb-streu", "Streudiagramm: Social-Media-Zeit und Trefferquote", `Jeder Punkt ist eine Person · Spearman ρ = ${zahl(rSP)}, ${pText(pSP)}`, fuss,
           daten.map((d) => ({ x: d.s, y: d.p })), C.screentime, 15, yT) },
@@ -542,9 +561,13 @@
   });
 
   // ---------- Darstellung ----------
-  function render(rows, demo) {
-    aktuelleRows = rows;
-    $("#csv").hidden = !rows.length;
+  function render(rohdaten, demo) {
+    letzte = { rows: rohdaten, demo };
+    aktuelleRows = demo ? [] : rohdaten; // CSV nur für echte Daten
+    const zusammen = $("#zusammen").checked;
+    altersstufen = zusammen ? ALTER_3 : C.alter;
+    const rows = zusammen ? rohdaten.map((r) => ({ ...r, alter: ZU_3[r.alter] || r.alter })) : rohdaten;
+    $("#csv").hidden = !aktuelleRows.length;
     const inhalt = $("#inhalt");
     if (!rows.length) { inhalt.innerHTML = `<p class="muted">Noch keine Antworten. Sobald jemand die Umfrage abschickt, erscheint sie hier.</p>`; return; }
 
@@ -553,7 +576,7 @@
     const sicher = beantwortet.filter((x) => x.sicher === "sicher");
     const anteilRichtig = (liste) => (liste.length ? (liste.filter((x) => x.ergebnis === "richtig").length / liste.length) * 100 : null);
 
-    const matrix = tabelle(C.alter, C.screentime, (a, s) => {
+    const matrix = tabelle(altersstufen, C.screentime, (a, s) => {
       const g = rows.filter((r) => r.alter === a && r.screentime === s);
       return { v: mittel(g.map(quote)), n: g.length };
     });
@@ -577,7 +600,7 @@
     });
 
     inhalt.innerHTML = `
-      ${demo ? `<p class="notice">Erfundene Beispieldaten. So sieht die Auswertung aus, sobald echte Antworten da sind.</p>` : ""}
+      ${demo ? `<p class="notice"><b>Simulierte Daten.</b> Diese Zahlen sind erfunden und zeigen nur, wie die Auswertung bei etwa ${rows.length} Teilnehmenden aussehen könnte. Auf jeder Abbildung steht „SIMULIERTE DATEN“. Nicht als echte Ergebnisse verwenden.</p>` : ""}
       <div class="kpis">
         <div class="kpi"><b>${rows.length}</b><span>Teilnehmende</span></div>
         <div class="kpi"><b>${pct(mittel(rows.map(quote)))}</b><span>richtig erkannt im Schnitt</span></div>
@@ -597,7 +620,7 @@
 
       <section class="block">
         <h2>Nach Altersgruppe</h2>
-        ${balken(gruppe(rows, "alter", C.alter))}
+        ${balken(gruppe(rows, "alter", altersstufen))}
       </section>
 
       <section class="block">
@@ -614,7 +637,7 @@
 
       <section class="block">
         <h2>Aufmachung als Hinweis, nach Alter</h2>
-        ${kreuz("alter", C.alter, "typ", C.typen)}
+        ${kreuz("alter", altersstufen, "typ", C.typen)}
       </section>
 
       <section class="block">
@@ -625,7 +648,7 @@
 
       <section class="block">
         <h2>Welche Fake-Merkmale werden erkannt? Nach Alter</h2>
-        ${kreuz("alter", C.alter, "merkmal", C.merkmale)}
+        ${kreuz("alter", altersstufen, "merkmal", C.merkmale)}
       </section>
 
       <section class="block">
@@ -638,7 +661,7 @@
         <h2>KI-Siegel</h2>
         <p class="muted small">Bei „Wolf“ trägt der Fake ein „Mit KI erstellt“-Siegel, bei „Butterpreis“ die echte Meldung. Wer KI-Inhalte pauschal für falsch hält, liegt beim Wolf richtig und beim Butterpreis falsch.</p>
         ${kreuz("screentime", C.screentime, "id", Object.fromEntries(S.filter((s) => s.ki).map((s) => [s.id, `${s.thema} (Siegel am ${s.ki === "fake" ? "Fake" : "echten Text"})`])))}
-        ${kreuz("alter", C.alter, "id", Object.fromEntries(S.filter((s) => s.ki).map((s) => [s.id, `${s.thema} (Siegel am ${s.ki === "fake" ? "Fake" : "echten Text"})`])))}
+        ${kreuz("alter", altersstufen, "id", Object.fromEntries(S.filter((s) => s.ki).map((s) => [s.id, `${s.thema} (Siegel am ${s.ki === "fake" ? "Fake" : "echten Text"})`])))}
       </section>
 
       <section class="block">
